@@ -1,0 +1,123 @@
+{
+  "transactions": [
+    {
+      "id": "1",
+      "date": "2023-12-11",
+      "description": "Rent",
+      "category": "Housing & Rent",
+      "type": "expense",
+      "amount": 1500
+    },
+    {
+      "id": "2",
+      "date": "2023-12-13",
+      "description": "Salary",
+      "category": "Salary & Income",
+      "type": "income",
+      "amount": 4200
+    },
+    {
+      "id": "3",
+      "date": "2023-12-14",
+      "description": "Spotify",
+      "category": "Subscriptions",
+      "type": "expense",
+      "amount": 11.99
+    },
+    {
+      "id": "mxwfGVy73ak",
+      "date": "2026-06-02",
+      "description": "spotify",
+      "category": "Shopping & Wants",
+      "type": "expense",
+      "amount": 23
+    },
+    {
+      "id": "46GcyNTC3AU",
+      "date": "2026-06-01",
+      "description": "mcdo",
+      "category": "Food & Dining",
+      "type": "expense",
+      "amount": 160
+    },
+    {
+      "id": "74jYoKr1LYQ",
+      "date": "2026-06-01",
+      "description": "income",
+      "category": "Salary & Income",
+      "type": "income",
+      "amount": 1000
+    },
+    {
+      "id": "C4WiuDRRgo0",
+      "date": "2026-06-01",
+      "description": "jeep",
+      "category": "Transportation",
+      "type": "expense",
+      "amount": 20
+    }
+  ],
+  "bills": [
+    {
+      "id": "bill-1",
+      "title": "Apartment Rent",
+      "description": "Monthly rent for apartment unit.",
+      "priority": "high",
+      "status": "pending",
+      "dueDate": "2026-06-05",
+      "amount": 1500,
+      "recurring": "monthly"
+    },
+    {
+      "id": "bill-2",
+      "title": "Internet Connection",
+      "description": "Fiber internet broadband monthly subscription.",
+      "priority": "medium",
+      "status": "in-progress",
+      "dueDate": "2026-06-10",
+      "amount": 49.99,
+      "recurring": "monthly"
+    },
+    {
+      "id": "bill-3",
+      "title": "Gym Membership",
+      "description": "Monthly health club/gym access fee.",
+      "priority": "low",
+      "status": "done",
+      "dueDate": "2026-06-12",
+      "amount": 29.99,
+      "recurring": "monthly"
+    }
+  ],
+  "wants": [
+    {
+      "id": "want-1",
+      "title": "Mechanical Keyboard",
+      "amount": 120,
+      "priority": "medium",
+      "status": "wanted"
+    },
+    {
+      "id": "want-2",
+      "title": "Wireless Earbuds",
+      "amount": 79,
+      "priority": "low",
+      "status": "wanted"
+    },
+    {
+      "id": "want-3",
+      "title": "Premium Coffee Beans",
+      "amount": 25,
+      "priority": "high",
+      "status": "wanted"
+    },
+    {
+      "id": "V1Jr1AFvoVQ",
+      "title": "Laptop",
+      "amount": 5000,
+      "priority": "low",
+      "status": "wanted"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
