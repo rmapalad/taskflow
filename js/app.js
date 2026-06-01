@@ -568,6 +568,11 @@ function renderTransactions() {
         let comparison = 0;
         if (key === 'date') {
             comparison = new Date(a.date) - new Date(b.date);
+            if (comparison === 0) {
+                const aId = isNaN(a.id) ? 0 : parseFloat(a.id);
+                const bId = isNaN(b.id) ? 0 : parseFloat(b.id);
+                comparison = aId - bId;
+            }
         } else if (key === 'description') {
             comparison = a.description.toLowerCase().localeCompare(b.description.toLowerCase());
         } else if (key === 'category') {
@@ -575,6 +580,16 @@ function renderTransactions() {
         } else if (key === 'amount') {
             comparison = parseFloat(a.amount) - parseFloat(b.amount);
         }
+        
+        if (comparison === 0 && key !== 'date') {
+            comparison = new Date(a.date) - new Date(b.date);
+            if (comparison === 0) {
+                const aId = isNaN(a.id) ? 0 : parseFloat(a.id);
+                const bId = isNaN(b.id) ? 0 : parseFloat(b.id);
+                comparison = aId - bId;
+            }
+        }
+        
         return order === 'asc' ? comparison : -comparison;
     });
 

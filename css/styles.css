@@ -399,7 +399,7 @@ input[type="range"]::-moz-range-thumb {
     margin-bottom: 1rem;
 }
 .table-responsive table {
-    min-width: 600px; /* Force scrollable on small screens */
+    min-width: 100%;
 }
 
 /* Mobile Media Queries */
@@ -413,6 +413,121 @@ input[type="range"]::-moz-range-thumb {
         height: auto;
         min-height: 100vh;
     }
+
+    /* Responsive Stacked Tables */
+    .table-responsive table, 
+    .table-responsive thead, 
+    .table-responsive tbody, 
+    .table-responsive th, 
+    .table-responsive td, 
+    .table-responsive tr { 
+        display: block; 
+    }
+    
+    .table-responsive thead tr { 
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+    
+    .table-responsive tr { 
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        margin-bottom: 16px; 
+        padding: 12px;
+        background-color: #ffffff;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    
+    .table-responsive td { 
+        border: none;
+        border-bottom: 1px solid #f0f0f0; 
+        position: relative;
+        padding: 10px 0 10px 45% !important; 
+        text-align: right;
+        font-size: 13px;
+    }
+    
+    .table-responsive td:last-child {
+        border-bottom: none;
+    }
+    
+    .table-responsive td::before { 
+        position: absolute;
+        top: 10px;
+        left: 0;
+        width: 40%; 
+        padding-right: 10px; 
+        white-space: nowrap;
+        text-align: left;
+        font-weight: 600;
+        font-size: 11px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+    }
+
+    /* Actions Column adjustments */
+    .table-responsive td.actions-col {
+        text-align: left;
+        padding-left: 0 !important;
+    }
+    .table-responsive td.actions-col::before {
+        display: none;
+    }
+    .table-responsive .action-btns {
+        justify-content: flex-start;
+        margin-top: 4px;
+    }
+
+    /* 1. Transactions Table labels */
+    #transaction-list td:nth-of-type(1)::before { content: "Date"; }
+    #transaction-list td:nth-of-type(2)::before { content: "Description"; }
+    #transaction-list td:nth-of-type(3)::before { content: "Category"; }
+    #transaction-list td:nth-of-type(4)::before { content: "Amount"; }
+    #transaction-list td:nth-of-type(5)::before { content: "Actions"; }
+
+    /* 2. Bills Ledger labels */
+    #bills-list-table-body td:nth-of-type(1)::before { content: "Bill Title"; }
+    #bills-list-table-body td:nth-of-type(2)::before { content: "Description"; }
+    #bills-list-table-body td:nth-of-type(3)::before { content: "Priority"; }
+    #bills-list-table-body td:nth-of-type(4)::before { content: "Status"; }
+    #bills-list-table-body td:nth-of-type(5)::before { content: "Due Date"; }
+    #bills-list-table-body td:nth-of-type(6)::before { content: "Amount"; }
+    #bills-list-table-body td:nth-of-type(7)::before { content: "Actions"; }
+
+    /* 3. Wants Ledger labels */
+    #wants-list-table-body td:nth-of-type(1)::before { content: "Want Item"; }
+    #wants-list-table-body td:nth-of-type(2)::before { content: "Cost"; }
+    #wants-list-table-body td:nth-of-type(3)::before { content: "Priority"; }
+    #wants-list-table-body td:nth-of-type(4)::before { content: "Status"; }
+    #wants-list-table-body td:nth-of-type(5)::before { content: "Actions"; }
+
+    /* 4. Budget Limits Overview labels */
+    #budget-limits-table-body td:nth-of-type(1)::before { content: "Category"; }
+    #budget-limits-table-body td:nth-of-type(2)::before { content: "Limit"; }
+    #budget-limits-table-body td:nth-of-type(3)::before { content: "Spent"; }
+    #budget-limits-table-body td:nth-of-type(4)::before { content: "Remaining"; }
+    #budget-limits-table-body td:nth-of-type(5)::before { content: "Progress"; }
+    #budget-limits-table-body td:nth-of-type(5) {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        padding-left: 0 !important;
+    }
+    #budget-limits-table-body td:nth-of-type(5)::before {
+        display: block;
+        position: static;
+        width: auto;
+        margin-right: auto;
+        padding-right: 0;
+    }
+
+    /* 5. Category Spending labels */
+    #analytics-summary-table-body td:nth-of-type(1)::before { content: "Category"; }
+    #analytics-summary-table-body td:nth-of-type(2)::before { content: "Count"; }
+    #analytics-summary-table-body td:nth-of-type(3)::before { content: "Total Spent"; }
+    #analytics-summary-table-body td:nth-of-type(4)::before { content: "% of Total"; }
+    #analytics-summary-table-body td:nth-of-type(5)::before { content: "Avg. Transaction"; }
 
     /* Sidebar Drawer Styles */
     .sidebar {
