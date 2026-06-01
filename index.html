@@ -10,10 +10,14 @@
 <body>
 
 <div class="app-container">
-    <aside class="sidebar">
-        <div class="logo">
-            NOTHING
-            <span>BUDGET</span>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="logo" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                NOTHING
+                <span>BUDGET</span>
+            </div>
+            <button id="btn-sidebar-close" style="display: none; background: transparent; border: none; font-size: 20px; cursor: pointer; color: var(--text-main); font-weight: bold; padding: 4px; line-height: 1;" aria-label="Close menu">✕</button>
         </div>
         <ul class="nav-links">
             <li class="active" data-view="dashboard"><span class="nav-icon">■</span> Dashboard</li>
@@ -35,10 +39,13 @@
 
     <main class="main-content">
         <header class="top-nav">
-            <ul class="top-menu">
-                <li class="active">DASHBOARD</li>
-                <li>TRANSACTIONS</li>
-            </ul>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <button id="btn-sidebar-toggle" style="display: none; background: transparent; border: none; font-size: 24px; cursor: pointer; color: var(--text-main); padding: 4px; line-height: 1;" aria-label="Open menu">☰</button>
+                <ul class="top-menu">
+                    <li class="active">DASHBOARD</li>
+                    <li>TRANSACTIONS</li>
+                </ul>
+            </div>
             <div class="top-icons">
                 <span>✉</span>
                 <span>🔔</span>
@@ -169,19 +176,21 @@
                     <div class="table-header-actions">
                         <h3>RECENT TRANSACTIONS</h3>
                     </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Description</th>
-                                <th>Category</th>
-                                <th>Amount</th>
-                                <th class="actions-col">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="transaction-list">
-                            </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th class="actions-col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transaction-list">
+                                </tbody>
+                        </table>
+                    </div>
                 </section>
             </div>
 
@@ -270,22 +279,24 @@
                 <!-- Bills Ledger Table -->
                 <section class="transactions-card">
                     <h3>BILLS LEDGER</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Bill Title</th>
-                                <th>Description</th>
-                                <th>Priority</th>
-                                <th>Status</th>
-                                <th>Due Date</th>
-                                <th>Amount</th>
-                                <th class="actions-col">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bills-list-table-body">
-                            <!-- Dynamic rows -->
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Bill Title</th>
+                                    <th>Description</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Due Date</th>
+                                    <th>Amount</th>
+                                    <th class="actions-col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bills-list-table-body">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
                 </section>
             </div>
             
@@ -368,20 +379,22 @@
                 <!-- Wants Ledger Table -->
                 <section class="transactions-card">
                     <h3>WANTS LEDGER</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Want Item</th>
-                                <th>Estimated Cost</th>
-                                <th>Priority</th>
-                                <th>Status</th>
-                                <th class="actions-col">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="wants-list-table-body">
-                            <!-- Dynamic rows -->
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Want Item</th>
+                                    <th>Estimated Cost</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th class="actions-col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="wants-list-table-body">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
                 </section>
             </div>
 
@@ -406,20 +419,22 @@
 
                 <section class="transactions-card">
                     <h3>BUDGET LIMITS OVERVIEW</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Category</th>
-                                <th>Limit</th>
-                                <th>Spent</th>
-                                <th>Remaining</th>
-                                <th>Progress</th>
-                            </tr>
-                        </thead>
-                        <tbody id="budget-limits-table-body">
-                            <!-- Dynamic entries -->
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Limit</th>
+                                    <th>Spent</th>
+                                    <th>Remaining</th>
+                                    <th>Progress</th>
+                                </tr>
+                            </thead>
+                            <tbody id="budget-limits-table-body">
+                                <!-- Dynamic entries -->
+                            </tbody>
+                        </table>
+                    </div>
                 </section>
             </div>
 
@@ -442,20 +457,22 @@
                 
                 <section class="transactions-card" style="margin-top: 24px;">
                     <h3>CATEGORY SPENDING SUMMARY</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Category</th>
-                                <th>Count</th>
-                                <th>Total Spent</th>
-                                <th>% of Total</th>
-                                <th>Avg. Transaction</th>
-                            </tr>
-                        </thead>
-                        <tbody id="analytics-summary-table-body">
-                            <!-- Dynamic summary rows -->
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Count</th>
+                                    <th>Total Spent</th>
+                                    <th>% of Total</th>
+                                    <th>Avg. Transaction</th>
+                                </tr>
+                            </thead>
+                            <tbody id="analytics-summary-table-body">
+                                <!-- Dynamic summary rows -->
+                            </tbody>
+                        </table>
+                    </div>
                 </section>
             </div>
 

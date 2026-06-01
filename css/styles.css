@@ -391,12 +391,189 @@ input[type="range"]::-moz-range-thumb {
     grid-template-columns: repeat(4, 1fr);
     gap: 16px;
 }
-@media (max-width: 900px) {
+/* Responsive Table Container */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 1rem;
+}
+.table-responsive table {
+    min-width: 600px; /* Force scrollable on small screens */
+}
+
+/* Mobile Media Queries */
+@media (max-width: 768px) {
+    body {
+        overflow-y: auto; /* Let mobile scroll normally */
+    }
+
+    .app-container {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    /* Sidebar Drawer Styles */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 280px;
+        z-index: 1000;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+        border-right: none;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .sidebar #btn-sidebar-close {
+        display: block !important;
+    }
+
+    /* Sidebar Backdrop Overlay */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.4);
+        z-index: 999;
+        backdrop-filter: blur(2px);
+    }
+
+    .sidebar-overlay.visible {
+        display: block;
+    }
+
+    /* Header adjustments */
+    .top-nav {
+        padding: 0 16px;
+        height: 56px;
+        position: sticky;
+        top: 0;
+        background-color: var(--bg-app);
+        z-index: 100;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .top-nav #btn-sidebar-toggle {
+        display: block !important;
+    }
+
+    .top-menu {
+        gap: 12px;
+    }
+
+    .top-menu li {
+        padding: 18px 0;
+        font-size: 11px;
+    }
+
+    /* Page Area Grid & Card wrapping */
+    .dashboard-area {
+        padding: 16px;
+        overflow-y: visible;
+    }
+
+    .header-container {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+        margin-bottom: 24px;
+    }
+
+    .month-filter-container {
+        align-items: flex-start;
+    }
+
+    .month-filter-container input[type="month"] {
+        width: 100%;
+        text-align: center;
+    }
+
+    .page-header {
+        font-size: 28px;
+    }
+
+    /* Grid Wrap overrides */
+    .cards-row {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .grid-two-cols {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .analytics-row {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .form-card, .transactions-card {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    #transaction-form, #filter-form, #budget-limit-form, #bill-form {
+        gap: 12px;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .form-group {
+        width: 100%;
+        margin-bottom: 4px;
+    }
+
+    .form-actions-row {
+        margin-top: 8px;
+        width: 100%;
+    }
+
+    .btn-submit, .btn-action {
+        width: 100%;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .table-header-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
     .bills-summary-grid {
         grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    /* Budgets View adjustments */
+    #view-budgets .form-card form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    /* Profile page statistics wrap */
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
     }
 }
-@media (max-width: 600px) {
+
+@media (max-width: 480px) {
     .bills-summary-grid {
         grid-template-columns: 1fr;
     }
