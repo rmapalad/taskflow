@@ -1,14 +1,215 @@
-// Detect if running on localhost/127.0.0.1 or on a deployed server
-const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+// Database Mode and Seed Data
+let dbMode = 'json-server'; // 'json-server' or 'localstorage'
 
-// Base URL configuration: Update the Render URL with your deployed web service URL
-const BASE_URL = isLocal 
-    ? 'http://localhost:3000' 
-    : 'https://YOUR-RENDER-APP-NAME.onrender.com';
+const SEED_DATA = {
+    transactions: [
+        { id: "1", date: "2023-12-11", description: "Rent", category: "Housing & Rent", type: "expense", amount: 1500 },
+        { id: "2", date: "2023-12-13", description: "Salary", category: "Salary & Income", type: "income", amount: 4200 },
+        { id: "3", date: "2023-12-14", description: "Spotify", category: "Subscriptions", type: "expense", amount: 11.99 },
+        { id: "mxwfGVy73ak", date: "2026-06-02", description: "spotify", category: "Subscriptions", type: "expense", amount: 23 },
+        { id: "46GcyNTC3AU", date: "2026-06-01", description: "mcdo", category: "Food & Dining", type: "expense", amount: 160 },
+        { id: "74jYoKr1LYQ", date: "2026-06-01", description: "income", category: "Salary & Income", type: "income", amount: 1000 },
+        { id: "C4WiuDRRgo0", date: "2026-06-01", description: "jeep", category: "Transportation", type: "expense", amount: 20 },
+        { id: "2nJQmS357KQ", date: "2026-06-01", description: "income", category: "Salary & Income", type: "income", amount: 5000 },
+        { id: "NkapqKzo0kw", date: "2026-06-01", description: "keyboard", category: "Shopping & Wants", type: "expense", amount: 5000 },
+        { id: "77pPMXJWLCA", date: "2026-06-01", description: "MOVIE", category: "Entertainment", type: "expense", amount: 290 },
+        { id: "MsJC6mqqWxs", date: "2026-06-01", description: "BONUS", category: "Salary & Income", type: "income", amount: 10000 },
+        { id: "-EG5TCVjF-Y", date: "2026-06-01", description: "Premium Coffee Beans", category: "Shopping & Wants", type: "expense", amount: 1500 }
+    ],
+    bills: [
+        { id: "bill-1", title: "Apartment Rent", description: "Monthly rent for apartment unit.", priority: "high", status: "pending", dueDate: "2026-06-05", amount: 4500, recurring: "monthly", recurrenceProcessed: true },
+        { id: "bill-2", title: "Internet Connection", description: "Fiber internet broadband monthly subscription.", priority: "medium", status: "in-progress", dueDate: "2026-06-10", amount: 49.99, recurring: "monthly" },
+        { id: "bill-3", title: "Gym Membership", description: "Monthly health club/gym access fee.", priority: "low", status: "done", dueDate: "2026-06-12", amount: 29.99, recurring: "monthly" }
+    ],
+    wants: [
+        { id: "want-1", title: "Mechanical Keyboard", amount: 3000, priority: "medium", status: "wanted" },
+        { id: "want-2", title: "Wireless Earbuds", amount: 3700, priority: "low", status: "wanted" },
+        { id: "want-3", title: "Premium Coffee Beans", amount: 1500, priority: "high", status: "bought" }
+    ]
+};
 
-const API = `${BASE_URL}/transactions`;
-const BILLS_API = `${BASE_URL}/bills`;
-const WANTS_API = `${BASE_URL}/wants`;
+function initLocalStorageData() {
+    if (!localStorage.getItem('nothing_budget_transactions')) {
+        localStorage.setItem('nothing_budget_transactions', JSON.stringify(SEED_DATA.transactions));
+    }
+    if (!localStorage.getItem('nothing_budget_bills')) {
+        localStorage.setItem('nothing_budget_bills', JSON.stringify(SEED_DATA.bills));
+    }
+    if (!localStorage.getItem('nothing_budget_wants')) {
+        localStorage.setItem('nothing_budget_wants', JSON.stringify(SEED_DATA.wants));
+    }
+}
+
+function updateDatabaseStatusUI() {
+    const dot = document.getElementById('db-status-dot');
+    const text = document.getElementById('db-status-text');
+    const toggleBtn = document.getElementById('btn-db-toggle');
+    
+    if (!dot || !text || !toggleBtn) return;
+    
+    if (dbMode === 'json-server') {
+        dot.style.backgroundColor = '#10b981'; // Green
+        text.innerText = 'Server Mode';
+        text.style.color = '#10b981';
+        toggleBtn.innerText = 'Use LocalStorage';
+    } else {
+        dot.style.backgroundColor = '#6366f1'; // Indigo/Blue
+        text.innerText = 'LocalStorage (Demo)';
+        text.style.color = '#6366f1';
+        toggleBtn.innerText = 'Connect to Server';
+    }
+}
+
+async function toggleDatabaseMode() {
+    const toggleBtn = document.getElementById('btn-db-toggle');
+    if (!toggleBtn) return;
+    
+    if (dbMode === 'json-server') {
+        dbMode = 'localstorage';
+        initLocalStorageData();
+        updateDatabaseStatusUI();
+        await reloadAllData();
+    } else {
+        toggleBtn.innerText = 'Connecting...';
+        toggleBtn.disabled = true;
+        
+        try {
+            const res = await originalFetch('http://localhost:3000/transactions?_limit=1');
+            if (res.ok) {
+                dbMode = 'json-server';
+                updateDatabaseStatusUI();
+                await reloadAllData();
+            } else {
+                throw new Error('Server returned error status');
+            }
+        } catch (err) {
+            alert('Could not connect to JSON-Server. Make sure it is running via "json-server --watch db.json --port 3000"!');
+            dbMode = 'localstorage';
+            updateDatabaseStatusUI();
+        } finally {
+            toggleBtn.disabled = false;
+        }
+    }
+}
+
+async function reloadAllData() {
+    await Promise.all([
+        loadTransactions(),
+        loadBills(),
+        loadWants()
+    ]);
+}
+
+async function detectDatabaseMode() {
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 1500); // 1.5s timeout
+        
+        const res = await originalFetch('http://localhost:3000/transactions?_limit=1', { signal: controller.signal });
+        clearTimeout(timeoutId);
+        
+        if (res.ok) {
+            dbMode = 'json-server';
+        } else {
+            dbMode = 'localstorage';
+        }
+    } catch (err) {
+        dbMode = 'localstorage';
+    }
+    initLocalStorageData();
+    updateDatabaseStatusUI();
+}
+
+// Fetch Interception
+const originalFetch = window.fetch;
+async function customFetch(url, options = {}) {
+    const urlStr = typeof url === 'string' ? url : (url instanceof URL ? url.href : '');
+    
+    if (!urlStr.startsWith('http://localhost:3000')) {
+        return originalFetch(url, options);
+    }
+    
+    const method = (options.method || 'GET').toUpperCase();
+    
+    if (dbMode === 'json-server') {
+        try {
+            return await originalFetch(url, options);
+        } catch (err) {
+            console.warn("JSON-Server not reachable. Switching to LocalStorage mode.", err);
+            dbMode = 'localstorage';
+            initLocalStorageData();
+            updateDatabaseStatusUI();
+        }
+    }
+    
+    // LocalStorage fallback
+    initLocalStorageData();
+    updateDatabaseStatusUI();
+    
+    const urlPath = urlStr.replace('http://localhost:3000/', '');
+    const pathParts = urlPath.split('?')[0].split('/'); // Ignore query string
+    const resource = pathParts[0]; // "transactions", "bills", or "wants"
+    const id = pathParts[1]; // undefined or the ID string
+    
+    const storageKey = `nothing_budget_${resource}`;
+    let data = JSON.parse(localStorage.getItem(storageKey)) || [];
+    
+    let responseData = null;
+    let status = 200;
+    
+    if (method === 'GET') {
+        if (id) {
+            const item = data.find(i => String(i.id) === String(id));
+            if (item) {
+                responseData = item;
+            } else {
+                status = 404;
+                responseData = { error: 'Not found' };
+            }
+        } else {
+            responseData = data;
+        }
+    } else if (method === 'POST') {
+        const body = JSON.parse(options.body);
+        data.push(body);
+        localStorage.setItem(storageKey, JSON.stringify(data));
+        responseData = body;
+        status = 201;
+    } else if (method === 'PUT') {
+        const body = JSON.parse(options.body);
+        const index = data.findIndex(i => String(i.id) === String(id));
+        if (index !== -1) {
+            data[index] = { ...data[index], ...body };
+            localStorage.setItem(storageKey, JSON.stringify(data));
+            responseData = data[index];
+        } else {
+            status = 404;
+            responseData = { error: 'Not found' };
+        }
+    } else if (method === 'DELETE') {
+        const index = data.findIndex(i => String(i.id) === String(id));
+        if (index !== -1) {
+            const deletedItem = data.splice(index, 1)[0];
+            localStorage.setItem(storageKey, JSON.stringify(data));
+            responseData = deletedItem;
+        } else {
+            status = 404;
+            responseData = { error: 'Not found' };
+        }
+    }
+    
+    return {
+        ok: status >= 200 && status < 300,
+        status: status,
+        json: async () => responseData,
+        text: async () => JSON.stringify(responseData)
+    };
+}
+window.fetch = customFetch;
+
+const API = 'http://localhost:3000/transactions';
+const BILLS_API = 'http://localhost:3000/bills';
+const WANTS_API = 'http://localhost:3000/wants';
 const form = document.getElementById('transaction-form');
 const list = document.getElementById('transaction-list');
 
@@ -1750,7 +1951,7 @@ document.getElementById('month-filter').addEventListener('change', (e) => {
 });
 
 // Initialize App
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     populateCategoryDropdowns();
     initBudgetsForm();
     initProfileControls();
@@ -1761,6 +1962,16 @@ document.addEventListener('DOMContentLoaded', () => {
     initWantsForm();
     resetWantForm();
     initWantsAllocationControls();
+    
+    // Detect database mode first
+    await detectDatabaseMode();
+    
+    // Bind toggle click listener
+    const toggleBtn = document.getElementById('btn-db-toggle');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', toggleDatabaseMode);
+    }
+    
     loadTransactions();
     loadBills();
     loadWants();
