@@ -71,6 +71,30 @@
       "category": "Shopping & Wants",
       "type": "expense",
       "amount": 5000
+    },
+    {
+      "id": "77pPMXJWLCA",
+      "date": "2026-06-01",
+      "description": "MOVIE",
+      "category": "Entertainment",
+      "type": "expense",
+      "amount": 290
+    },
+    {
+      "id": "MsJC6mqqWxs",
+      "date": "2026-06-01",
+      "description": "BONUS",
+      "category": "Salary & Income",
+      "type": "income",
+      "amount": 10000
+    },
+    {
+      "id": "-EG5TCVjF-Y",
+      "date": "2026-06-01",
+      "description": "Premium Coffee Beans",
+      "category": "Shopping & Wants",
+      "type": "expense",
+      "amount": 1500
     }
   ],
   "bills": [
@@ -81,7 +105,7 @@
       "priority": "high",
       "status": "pending",
       "dueDate": "2026-06-05",
-      "amount": 1500,
+      "amount": 4500,
       "recurring": "monthly",
       "recurrenceProcessed": true
     },
@@ -110,23 +134,23 @@
     {
       "id": "want-1",
       "title": "Mechanical Keyboard",
-      "amount": 120,
+      "amount": 3000,
       "priority": "medium",
       "status": "wanted"
     },
     {
       "id": "want-2",
       "title": "Wireless Earbuds",
-      "amount": 79,
+      "amount": 3700,
       "priority": "low",
       "status": "wanted"
     },
     {
       "id": "want-3",
       "title": "Premium Coffee Beans",
-      "amount": 25,
+      "amount": 1500,
       "priority": "high",
-      "status": "wanted"
+      "status": "bought"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

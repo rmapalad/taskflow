@@ -1,6 +1,14 @@
-const API = 'http://localhost:3000/transactions';
-const BILLS_API = 'http://localhost:3000/bills';
-const WANTS_API = 'http://localhost:3000/wants';
+// Detect if running on localhost/127.0.0.1 or on a deployed server
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+// Base URL configuration: Update the Render URL with your deployed web service URL
+const BASE_URL = isLocal 
+    ? 'http://localhost:3000' 
+    : 'https://YOUR-RENDER-APP-NAME.onrender.com';
+
+const API = `${BASE_URL}/transactions`;
+const BILLS_API = `${BASE_URL}/bills`;
+const WANTS_API = `${BASE_URL}/wants`;
 const form = document.getElementById('transaction-form');
 const list = document.getElementById('transaction-list');
 

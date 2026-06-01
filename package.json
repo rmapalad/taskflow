@@ -1,0 +1,12 @@
+{
+  "name": "budget-tracker-api",
+  "version": "1.0.0",
+  "description": "Backend database server for Budget Tracker",
+  "main": "db.json",
+  "scripts": {
+    "start": "json-server --watch db.json --port $PORT"
+  },
+  "dependencies": {
+    "json-server": "^0.17.4"
+  }
+}
