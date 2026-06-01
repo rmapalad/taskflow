@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAPALAD Budget - Transaction Tracker</title>
+    <title>Nothing Budget - Transaction Tracker</title>
     <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -12,7 +12,7 @@
 <div class="app-container">
     <aside class="sidebar">
         <div class="logo">
-            MAPALAD
+            NOTHING
             <span>BUDGET</span>
         </div>
         <ul class="nav-links">
@@ -30,10 +30,6 @@
             <ul class="top-menu">
                 <li class="active">DASHBOARD</li>
                 <li>TRANSACTIONS</li>
-                <li>BUDGETS</li>
-                <li>BILLS</li>
-                <li>WANTS</li>
-                <li>REPORTS</li>
             </ul>
             <div class="top-icons">
                 <span>✉</span>
@@ -141,7 +137,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="description">Description</label>
-                                <input type="text" id="description" name="description" placeholder="e.g. Spotify" required>
+                                <input type="text" id="description" name="description" placeholder="e.g. Spotify (optional)">
                             </div>
                             <div class="form-group">
                                 <label for="category">Category</label>
@@ -183,86 +179,85 @@
 
             <!-- Bills View -->
             <div id="view-bills" style="display: none;">
-                <div class="grid-two-cols" style="margin-bottom: 24px;">
-                    <!-- Add/Edit Bill Card -->
-                    <section class="form-card" style="margin-bottom: 0;">
-                        <h3 id="bill-form-title">NEW BILL</h3>
-                        <form id="bill-form">
-                            <div class="form-group">
-                                <label for="bill-title">Bill Title</label>
-                                <input type="text" id="bill-title" name="title" placeholder="e.g. Electricity Bill" required>
-                            </div>
-                            <div class="form-group" style="margin-top: 12px;">
-                                <label for="bill-desc">Description</label>
-                                <textarea id="bill-desc" name="description" placeholder="e.g. Account number, Billing period, etc." rows="2" required></textarea>
-                            </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; width: 100%;">
-                                <div class="form-group">
-                                    <label for="bill-priority">Priority</label>
-                                    <select id="bill-priority" name="priority" required>
-                                        <option value="low">Low (Wants)</option>
-                                        <option value="medium">Medium (Variable)</option>
-                                        <option value="high">High (Essential)</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="bill-status">Status</label>
-                                    <select id="bill-status" name="status" required>
-                                        <option value="pending">Pending</option>
-                                        <option value="in-progress">In-Progress</option>
-                                        <option value="done">Settled</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; width: 100%;">
-                                <div class="form-group">
-                                    <label for="bill-due">Due Date</label>
-                                    <input type="date" id="bill-due" name="dueDate" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="bill-amount">Amount (₱)</label>
-                                    <input type="number" id="bill-amount" name="amount" min="0" step="0.01" required>
-                                </div>
-                            </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; width: 100%;">
-                                <div class="form-group">
-                                    <label for="bill-recurring">Recurring</label>
-                                    <select id="bill-recurring" name="recurring" required>
-                                        <option value="none">One-time</option>
-                                        <option value="monthly">Monthly</option>
-                                        <option value="yearly">Yearly</option>
-                                    </select>
-                                </div>
-                                <div></div>
-                            </div>
-                            <div class="form-actions-row" style="display: flex; gap: 8px; justify-content: flex-end; width: 100%; margin-top: 16px;">
-                                <button type="button" id="cancel-bill-edit-btn" class="btn-action" style="display: none; background-color: var(--border-color); color: var(--text-main);">Cancel</button>
-                                <button type="submit" class="btn-submit" id="bill-submit-btn">Add Bill</button>
-                            </div>
-                        </form>
-                    </section>
+                <!-- Add/Edit Bill Card -->
+                <section class="form-card" style="margin-bottom: 24px;">
+                    <h3 id="bill-form-title">NEW BILL</h3>
+                    <form id="bill-form">
+                        <div class="form-group" style="min-width: 200px; flex: 2;">
+                            <label for="bill-title">Bill Title</label>
+                            <input type="text" id="bill-title" name="title" placeholder="e.g. Electricity Bill" required>
+                        </div>
+                        <div class="form-group" style="min-width: 200px; flex: 2;">
+                            <label for="bill-desc">Description</label>
+                            <input type="text" id="bill-desc" name="description" placeholder="e.g. Account number, Billing period (optional)">
+                        </div>
+                        <div class="form-group" style="min-width: 110px; flex: 1;">
+                            <label for="bill-priority">Priority</label>
+                            <select id="bill-priority" name="priority" required>
+                                <option value="low">Low (Wants)</option>
+                                <option value="medium">Medium (Variable)</option>
+                                <option value="high">High (Essential)</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="min-width: 110px; flex: 1;">
+                            <label for="bill-status">Status</label>
+                            <select id="bill-status" name="status" required>
+                                <option value="pending">Pending</option>
+                                <option value="in-progress">In-Progress</option>
+                                <option value="done">Settled</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="min-width: 130px; flex: 1;">
+                            <label for="bill-due">Due Date</label>
+                            <input type="date" id="bill-due" name="dueDate" required>
+                        </div>
+                        <div class="form-group" style="min-width: 120px; flex: 1;">
+                            <label for="bill-amount">Amount (₱)</label>
+                            <input type="number" id="bill-amount" name="amount" min="0" step="0.01" placeholder="0.00" required>
+                        </div>
+                        <div class="form-group" style="min-width: 120px; flex: 1;">
+                            <label for="bill-recurring">Recurring</label>
+                            <select id="bill-recurring" name="recurring" required>
+                                <option value="none">One-time</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="yearly">Yearly</option>
+                            </select>
+                        </div>
+                        <div class="form-actions-row" style="display: flex; gap: 8px; align-items: flex-end; height: 40px; margin-bottom: 0;">
+                            <button type="button" id="cancel-bill-edit-btn" class="btn-action" style="display: none; background-color: var(--border-color); color: var(--text-main); height: 40px; padding: 10px 16px;">Cancel</button>
+                            <button type="submit" class="btn-submit" id="bill-submit-btn" style="height: 40px;">Add Bill</button>
+                        </div>
+                    </form>
+                </section>
 
-                    <!-- Bills Summary Card -->
-                    <section class="transactions-card" style="margin-bottom: 0;">
-                        <h3>BILLS SUMMARY</h3>
-                        <div class="stats-grid" style="margin-bottom: 16px;">
-                            <div class="stat-item">
-                                <div class="stat-label">Total Outstanding</div>
-                                <div class="stat-value text-red" id="bills-total-outstanding">₱0.00</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-label">Pending / Unpaid</div>
-                                <div class="stat-value" id="bills-pending-count">0</div>
-                            </div>
+                <!-- Bills Summary Card -->
+                <section class="transactions-card" style="margin-bottom: 24px;">
+                    <h3>BILLS SUMMARY</h3>
+                    <div class="bills-summary-grid" style="margin-bottom: 16px;">
+                        <div class="stat-item">
+                            <div class="stat-label">Total Outstanding</div>
+                            <div class="stat-value text-red" id="bills-total-outstanding">₱0.00</div>
                         </div>
-                        <div class="progress-wrapper" style="margin-top: 16px;">
-                            <div class="progress-label" id="bills-progress-pct">0% Settled</div>
-                            <div class="progress-bar-bg">
-                                <div class="progress-bar-fill" id="bills-progress-bar" style="width: 0%;"></div>
-                            </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Total Settled</div>
+                            <div class="stat-value text-green" id="bills-total-settled">₱0.00</div>
                         </div>
-                    </section>
-                </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Pending Bills</div>
+                            <div class="stat-value" id="bills-pending-count">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Next Bill Due</div>
+                            <div class="stat-value" id="bills-next-due" style="font-size: 14px; font-family: inherit; font-weight: 600; line-height: 1.4; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">None Pending</div>
+                        </div>
+                    </div>
+                    <div class="progress-wrapper" style="margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                        <div class="progress-label" id="bills-progress-pct" style="font-weight: 600;">0% Settled</div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="bills-progress-bar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </section>
 
                 <!-- Bills Ledger Table -->
                 <section class="transactions-card">
@@ -345,7 +340,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; width: 100%;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; width: 100%; align-items: flex-end;">
                                 <div class="form-group">
                                     <label for="want-status">Status</label>
                                     <select id="want-status" name="status" required>
@@ -353,11 +348,10 @@
                                         <option value="bought">Bought</option>
                                     </select>
                                 </div>
-                                <div></div>
-                            </div>
-                            <div class="form-actions-row" style="display: flex; gap: 8px; justify-content: flex-end; width: 100%; margin-top: 16px;">
-                                <button type="button" id="cancel-want-edit-btn" class="btn-action" style="display: none; background-color: var(--border-color); color: var(--text-main);">Cancel</button>
-                                <button type="submit" class="btn-submit" id="want-submit-btn">Add Want</button>
+                                <div class="form-actions-row" style="display: flex; gap: 8px; justify-content: flex-end; margin-bottom: 0;">
+                                    <button type="button" id="cancel-want-edit-btn" class="btn-action" style="display: none; background-color: var(--border-color); color: var(--text-main);">Cancel</button>
+                                    <button type="submit" class="btn-submit" id="want-submit-btn">Add Want</button>
+                                </div>
                             </div>
                         </form>
                     </section>
@@ -385,41 +379,40 @@
 
             <!-- Budgets View -->
             <div id="view-budgets" style="display: none;">
-                <div class="grid-two-cols">
-                    <section class="form-card">
-                        <h3>SET BUDGET LIMITS</h3>
-                        <form id="budget-limit-form">
-                            <div class="form-group">
-                                <label for="budget-category">Category</label>
-                                <select id="budget-category" name="category" required>
-                                    <!-- Populated dynamically -->
-                                </select>
-                            </div>
-                            <div class="form-group" style="margin-top: 12px; margin-bottom: 12px;">
-                                <label for="budget-amount">Limit Amount (₱)</label>
-                                <input type="number" id="budget-amount" name="amount" min="0" step="1" required>
-                            </div>
-                            <button type="submit" class="btn-submit">Set Limit</button>
-                        </form>
-                    </section>
+                <section class="form-card" style="margin-bottom: 24px;">
+                    <h3>SET BUDGET LIMITS</h3>
+                    <form id="budget-limit-form">
+                        <div class="form-group">
+                            <label for="budget-category">Category</label>
+                            <select id="budget-category" name="category" required>
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="budget-amount">Limit Amount (₱)</label>
+                            <input type="number" id="budget-amount" name="amount" min="0" step="1" placeholder="e.g. 5000" required>
+                        </div>
+                        <button type="submit" class="btn-submit">Set Limit</button>
+                    </form>
+                </section>
 
-                    <section class="transactions-card">
-                        <h3>BUDGET LIMITS OVERVIEW</h3>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Category</th>
-                                    <th>Limit</th>
-                                    <th>Spent</th>
-                                    <th>Remaining</th>
-                                </tr>
-                            </thead>
-                            <tbody id="budget-limits-table-body">
-                                <!-- Dynamic entries -->
-                            </tbody>
-                        </table>
-                    </section>
-                </div>
+                <section class="transactions-card">
+                    <h3>BUDGET LIMITS OVERVIEW</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Limit</th>
+                                <th>Spent</th>
+                                <th>Remaining</th>
+                                <th>Progress</th>
+                            </tr>
+                        </thead>
+                        <tbody id="budget-limits-table-body">
+                            <!-- Dynamic entries -->
+                        </tbody>
+                    </table>
+                </section>
             </div>
 
             <!-- Analytics View -->

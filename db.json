@@ -28,7 +28,7 @@
       "id": "mxwfGVy73ak",
       "date": "2026-06-02",
       "description": "spotify",
-      "category": "Shopping & Wants",
+      "category": "Subscriptions",
       "type": "expense",
       "amount": 23
     },
@@ -55,6 +55,22 @@
       "category": "Transportation",
       "type": "expense",
       "amount": 20
+    },
+    {
+      "id": "2nJQmS357KQ",
+      "date": "2026-06-01",
+      "description": "income",
+      "category": "Salary & Income",
+      "type": "income",
+      "amount": 5000
+    },
+    {
+      "id": "NkapqKzo0kw",
+      "date": "2026-06-01",
+      "description": "keyboard",
+      "category": "Shopping & Wants",
+      "type": "expense",
+      "amount": 5000
     }
   ],
   "bills": [
@@ -66,7 +82,8 @@
       "status": "pending",
       "dueDate": "2026-06-05",
       "amount": 1500,
-      "recurring": "monthly"
+      "recurring": "monthly",
+      "recurrenceProcessed": true
     },
     {
       "id": "bill-2",
@@ -109,13 +126,6 @@
       "title": "Premium Coffee Beans",
       "amount": 25,
       "priority": "high",
-      "status": "wanted"
-    },
-    {
-      "id": "V1Jr1AFvoVQ",
-      "title": "Laptop",
-      "amount": 5000,
-      "priority": "low",
       "status": "wanted"
     }
   ],

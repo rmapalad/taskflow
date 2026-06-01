@@ -15,16 +15,16 @@ let wantsAllocationPct = parseFloat(localStorage.getItem('nothing_budget_wants_p
 let currentView = 'dashboard'; // dashboard, budgets, analytics, profile
 
 const categoriesMetadata = {
-    'Food & Dining': { icon: '🍔', color: '#f59e0b', type: 'expense' },
-    'Housing & Rent': { icon: '🏠', color: '#78350f', type: 'expense' },
-    'Utilities & Bills': { icon: '⚡', color: '#3b82f6', type: 'expense' },
-    'Transportation': { icon: '🚗', color: '#6366f1', type: 'expense' },
-    'Shopping & Wants': { icon: '🛍️', color: '#ec4899', type: 'expense' },
-    'Entertainment': { icon: '🍿', color: '#ef4444', type: 'expense' },
-    'Subscriptions': { icon: '⟳', color: '#14b8a6', type: 'expense' },
-    'Healthcare & Gym': { icon: '🩺', color: '#10b981', type: 'expense' },
-    'Salary & Income': { icon: '💰', color: '#22c55e', type: 'income' },
-    'Savings & Investments': { icon: '📈', color: '#84cc16', type: 'income' }
+    'Food & Dining': { icon: '♨', color: '#f59e0b', type: 'expense' },
+    'Housing & Rent': { icon: '⌂', color: '#78350f', type: 'expense' },
+    'Utilities & Bills': { icon: '⌁', color: '#3b82f6', type: 'expense' },
+    'Transportation': { icon: '⛍', color: '#6366f1', type: 'expense' },
+    'Shopping & Wants': { icon: '◈', color: '#ec4899', type: 'expense' },
+    'Entertainment': { icon: '♫', color: '#ef4444', type: 'expense' },
+    'Subscriptions': { icon: '↻', color: '#14b8a6', type: 'expense' },
+    'Healthcare & Gym': { icon: '✙', color: '#10b981', type: 'expense' },
+    'Salary & Income': { icon: '⛁', color: '#22c55e', type: 'income' },
+    'Savings & Investments': { icon: '↗', color: '#84cc16', type: 'income' }
 };
 
 const defaultBudgetLimits = {
@@ -52,24 +52,24 @@ let sortOrder = 'desc';
 // Helper: Filter transactions for the active month
 function getFilteredTransactions() {
     let filtered = transactions;
-    
+
     if (currentMonth) {
         filtered = filtered.filter(t => t.date && t.date.substring(0, 7) === currentMonth);
     }
-    
+
     if (filterSearch.trim() !== '') {
         const query = filterSearch.toLowerCase().trim();
         filtered = filtered.filter(t => t.description && t.description.toLowerCase().includes(query));
     }
-    
+
     if (filterCategory !== 'All') {
         filtered = filtered.filter(t => t.category === filterCategory);
     }
-    
+
     if (filterType !== 'All') {
         filtered = filtered.filter(t => t.type === filterType);
     }
-    
+
     return filtered;
 }
 
@@ -79,12 +79,12 @@ function updateHeader() {
     const [year, month] = currentMonth.split('-');
     const dateObj = new Date(year, parseInt(month) - 1, 1);
     const monthName = dateObj.toLocaleString('en-US', { month: 'long' }).toUpperCase();
-    
+
     const displayEl = document.getElementById('current-month-display');
     if (displayEl) {
         displayEl.innerText = `${monthName} ${year}`;
     }
-    
+
     const filterInput = document.getElementById('month-filter');
     if (filterInput && filterInput.value !== currentMonth) {
         filterInput.value = currentMonth;
@@ -95,33 +95,33 @@ function updateHeader() {
 function updateBudgetUtilization() {
     const listContainer = document.getElementById('budget-utilization-list');
     if (!listContainer) return;
-    
+
     listContainer.innerHTML = '';
     const filtered = getFilteredTransactions();
-    
+
     const categoryExpenses = {};
     Object.keys(categoriesMetadata).forEach(cat => {
         if (categoriesMetadata[cat].type === 'expense') {
             categoryExpenses[cat] = 0;
         }
     });
-    
+
     filtered.forEach(t => {
         if (t.type === 'expense' && categoryExpenses.hasOwnProperty(t.category)) {
             categoryExpenses[t.category] += parseFloat(t.amount);
         }
     });
-    
+
     Object.keys(categoryExpenses).forEach(cat => {
         const spent = categoryExpenses[cat];
         const limit = budgetLimits[cat] || 0;
         const pct = limit > 0 ? Math.round((spent / limit) * 100) : 0;
         const barWidth = Math.min(pct, 100);
-        
+
         const isOver = spent > limit;
         const catMeta = categoriesMetadata[cat] || { icon: '❓', color: '#888888' };
         const barColor = catMeta.color;
-        
+
         const li = document.createElement('li');
         li.className = 'util-item';
         li.innerHTML = `
@@ -160,14 +160,14 @@ function updateDashboard() {
         }
     });
 
-    const formatCurrency = (num) => '₱' + num.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    const formatCurrency = (num) => '₱' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     document.getElementById('display-balance').innerText = formatCurrency(totalBalance);
     document.getElementById('display-expenses').innerText = formatCurrency(totalExpenses);
 
     const assumedIncomeGoal = totalIncome > 0 ? totalIncome : 5000;
     const expensePercent = Math.min((totalExpenses / assumedIncomeGoal) * 100, 100);
-    
+
     document.getElementById('display-percent').innerText = `${Math.round(expensePercent)}%`;
     document.getElementById('display-bar').style.width = `${expensePercent}%`;
 
@@ -179,13 +179,13 @@ function drawSparkline() {
     const canvas = document.getElementById('balanceChart');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    
+
     // Sort all transactions chronologically to calculate running balance
     const chronTransactions = [...transactions].sort((a, b) => new Date(a.date) - new Date(b.date));
-    
+
     // Calculate running balance history for the active month
     let balance = 0;
-    
+
     // Find initial starting balance before the active month
     chronTransactions.forEach(t => {
         if (t.date && t.date.substring(0, 7) < currentMonth) {
@@ -195,7 +195,7 @@ function drawSparkline() {
     });
 
     const balanceHistory = [balance];
-    
+
     chronTransactions.forEach(t => {
         if (t.date && t.date.substring(0, 7) === currentMonth) {
             if (t.type === 'income') {
@@ -219,9 +219,9 @@ function drawSparkline() {
     const minData = Math.min(...data);
     const range = maxData - minData;
     const stepX = width / (data.length - 1);
-    
+
     ctx.clearRect(0, 0, width, height);
-    
+
     ctx.beginPath();
     ctx.moveTo(0, height);
     data.forEach((val, i) => {
@@ -252,7 +252,7 @@ async function loadTransactions() {
         const res = await fetch(API);
         if (!res.ok) throw new Error('Failed to load');
         transactions = await res.json();
-        
+
         // Initialize currentMonth if empty
         if (!currentMonth) {
             if (transactions.length > 0) {
@@ -263,7 +263,7 @@ async function loadTransactions() {
                 currentMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
             }
         }
-        
+
         updateHeader();
         switchView(currentView);
         renderTransactions();
@@ -319,7 +319,7 @@ function startEditTransaction(t) {
     form.description.value = t.description;
     form.category.value = t.category;
     form.amount.value = t.amount;
-    
+
     document.getElementById('submit-btn').innerText = 'Update';
     document.getElementById('cancel-edit-btn').style.display = 'block';
     form.scrollIntoView({ behavior: 'smooth' });
@@ -347,7 +347,7 @@ function cancelEditTransaction() {
 // --- Render Table & Sorting ---
 function renderTransactions() {
     list.innerHTML = '';
-    
+
     const keyInput = document.getElementById('sort-key');
     const orderInput = document.getElementById('sort-order');
     const key = keyInput ? keyInput.value : sortKey;
@@ -368,15 +368,15 @@ function renderTransactions() {
         }
         return order === 'asc' ? comparison : -comparison;
     });
-    
+
     filtered.forEach(t => {
         const tr = document.createElement('tr');
-        
+
         const amountClass = t.type === 'income' ? 'amount-pos' : 'amount-neg';
         const amountSign = t.type === 'income' ? '+' : '-';
-        const formattedAmount = `₱${parseFloat(t.amount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        const formattedAmount = `₱${parseFloat(t.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-        const catMeta = categoriesMetadata[t.category] || { icon: '❓', color: '#888888' };
+        const catMeta = categoriesMetadata[t.category] || { icon: '◇', color: '#888888' };
         const categoryBadgeHtml = `
             <span class="category-badge">
                 <span class="category-badge-dot" style="background-color: ${catMeta.color};"></span>
@@ -412,10 +412,10 @@ function renderTransactions() {
 // --- Event Listeners ---
 form.addEventListener('submit', (e) => {
     e.preventDefault();
-    
+
     const category = form.category.value;
     const type = categoriesMetadata[category] ? categoriesMetadata[category].type : 'expense';
-    
+
     const transactionData = {
         date: form.date.value,
         description: form.description.value.trim(),
@@ -424,7 +424,7 @@ form.addEventListener('submit', (e) => {
         amount: parseFloat(form.amount.value)
     };
 
-    if (!transactionData.description || isNaN(transactionData.amount)) {
+    if (isNaN(transactionData.amount)) {
         alert('Please fill out the form correctly.');
         return;
     }
@@ -452,7 +452,7 @@ function initFilterListeners() {
     const sortKeySelect = document.getElementById('sort-key');
     const sortOrderSelect = document.getElementById('sort-order');
     const clearBtn = document.getElementById('btn-clear-filters');
-    
+
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             filterSearch = e.target.value;
@@ -461,7 +461,7 @@ function initFilterListeners() {
             drawSparkline();
         });
     }
-    
+
     if (categorySelect) {
         categorySelect.addEventListener('change', (e) => {
             filterCategory = e.target.value;
@@ -470,7 +470,7 @@ function initFilterListeners() {
             drawSparkline();
         });
     }
-    
+
     if (typeSelect) {
         typeSelect.addEventListener('change', (e) => {
             filterType = e.target.value;
@@ -479,21 +479,21 @@ function initFilterListeners() {
             drawSparkline();
         });
     }
-    
+
     if (sortKeySelect) {
         sortKeySelect.addEventListener('change', (e) => {
             sortKey = e.target.value;
             renderTransactions();
         });
     }
-    
+
     if (sortOrderSelect) {
         sortOrderSelect.addEventListener('change', (e) => {
             sortOrder = e.target.value;
             renderTransactions();
         });
     }
-    
+
     if (clearBtn) {
         clearBtn.addEventListener('click', () => {
             filterSearch = '';
@@ -501,13 +501,13 @@ function initFilterListeners() {
             filterType = 'All';
             sortKey = 'date';
             sortOrder = 'desc';
-            
+
             if (searchInput) searchInput.value = '';
             if (categorySelect) categorySelect.value = 'All';
             if (typeSelect) typeSelect.value = 'All';
             if (sortKeySelect) sortKeySelect.value = 'date';
             if (sortOrderSelect) sortOrderSelect.value = 'desc';
-            
+
             renderTransactions();
             updateDashboard();
             drawSparkline();
@@ -519,7 +519,7 @@ function populateCategoryDropdowns() {
     const filterSelect = document.getElementById('filter-category');
     const transactionSelect = document.getElementById('category');
     const budgetSelect = document.getElementById('budget-category');
-    
+
     if (filterSelect) {
         filterSelect.innerHTML = '<option value="All">All Categories</option>';
         Object.keys(categoriesMetadata).forEach(cat => {
@@ -530,7 +530,7 @@ function populateCategoryDropdowns() {
             filterSelect.appendChild(opt);
         });
     }
-    
+
     if (transactionSelect) {
         transactionSelect.innerHTML = '';
         Object.keys(categoriesMetadata).forEach(cat => {
@@ -541,7 +541,7 @@ function populateCategoryDropdowns() {
             transactionSelect.appendChild(opt);
         });
     }
-    
+
     if (budgetSelect) {
         budgetSelect.innerHTML = '';
         Object.keys(categoriesMetadata).forEach(cat => {
@@ -560,17 +560,17 @@ function populateCategoryDropdowns() {
 function renderBudgetsView() {
     const tableBody = document.getElementById('budget-limits-table-body');
     if (!tableBody) return;
-    
+
     tableBody.innerHTML = '';
     const filtered = getFilteredTransactions();
-    
+
     const categoryExpenses = {};
     Object.keys(categoriesMetadata).forEach(cat => {
         if (categoriesMetadata[cat].type === 'expense') {
             categoryExpenses[cat] = 0;
         }
     });
-    
+
     filtered.forEach(t => {
         if (t.type === 'expense' && categoryExpenses.hasOwnProperty(t.category)) {
             categoryExpenses[t.category] += parseFloat(t.amount);
@@ -583,8 +583,13 @@ function renderBudgetsView() {
         const spent = categoryExpenses[cat] || 0;
         const remaining = limit - spent;
         const isOver = remaining < 0;
-        
+
+        const pct = limit > 0 ? Math.round((spent / limit) * 100) : 0;
+        const barWidth = Math.min(pct, 100);
+
         const catMeta = categoriesMetadata[cat] || { icon: '❓', color: '#888888' };
+        const barColor = isOver ? 'var(--accent-red)' : catMeta.color;
+
         const categoryBadgeHtml = `
             <span class="category-badge">
                 <span class="category-badge-dot" style="background-color: ${catMeta.color};"></span>
@@ -595,11 +600,19 @@ function renderBudgetsView() {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${categoryBadgeHtml}</td>
-            <td>₱${limit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-            <td class="${spent > 0 ? 'amount-neg' : ''}">₱${spent.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td>₱${limit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            <td class="${spent > 0 ? 'amount-neg' : ''}">₱${spent.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
             <td class="${isOver ? 'text-red' : 'text-green'}" style="font-weight: 600;">
-                ${isOver ? '-' : ''}₱${Math.abs(remaining).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                ${isOver ? '-' : ''}₱${Math.abs(remaining).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 ${isOver ? ' (Overspent)' : ''}
+            </td>
+            <td style="min-width: 160px; vertical-align: middle;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="flex: 1; height: 6px; background-color: #e0e0e0; border-radius: 3px; overflow: hidden; position: relative;">
+                        <div style="height: 100%; width: ${barWidth}%; background-color: ${barColor}; transition: width 0.3s ease;"></div>
+                    </div>
+                    <span style="font-size: 11px; font-weight: 600; min-width: 35px; text-align: right;" class="${isOver ? 'text-red' : ''}">${pct}%</span>
+                </div>
             </td>
         `;
         tableBody.appendChild(tr);
@@ -609,24 +622,24 @@ function renderBudgetsView() {
 function initBudgetsForm() {
     const budgetForm = document.getElementById('budget-limit-form');
     if (!budgetForm) return;
-    
+
     budgetForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const category = document.getElementById('budget-category').value;
         const amount = parseFloat(document.getElementById('budget-amount').value);
-        
+
         if (!category || isNaN(amount) || amount < 0) {
             alert('Please enter a valid amount.');
             return;
         }
-        
+
         budgetLimits[category] = amount;
         localStorage.setItem('nothing_budget_limits', JSON.stringify(budgetLimits));
-        
+
         renderBudgetsView();
         updateBudgetUtilization();
         updateDashboard();
-        
+
         budgetForm.reset();
     });
 }
@@ -635,19 +648,19 @@ function initBudgetsForm() {
 function renderAnalyticsView() {
     const tableBody = document.getElementById('analytics-summary-table-body');
     if (!tableBody) return;
-    
+
     tableBody.innerHTML = '';
     const filtered = getFilteredTransactions().filter(t => t.type === 'expense');
-    
+
     const summary = {};
     Object.keys(categoriesMetadata).forEach(cat => {
         if (categoriesMetadata[cat].type === 'expense') {
             summary[cat] = { count: 0, total: 0 };
         }
     });
-    
+
     let overallExpense = 0;
-    
+
     filtered.forEach(t => {
         if (summary.hasOwnProperty(t.category)) {
             summary[t.category].count++;
@@ -655,12 +668,12 @@ function renderAnalyticsView() {
             overallExpense += parseFloat(t.amount);
         }
     });
-    
+
     Object.keys(summary).forEach(cat => {
         const item = summary[cat];
         const pct = overallExpense > 0 ? ((item.total / overallExpense) * 100).toFixed(1) : '0.0';
         const avg = item.count > 0 ? (item.total / item.count).toFixed(2) : '0.00';
-        
+
         const catMeta = categoriesMetadata[cat] || { icon: '❓', color: '#888888' };
         const categoryBadgeHtml = `
             <span class="category-badge">
@@ -673,13 +686,13 @@ function renderAnalyticsView() {
         tr.innerHTML = `
             <td>${categoryBadgeHtml}</td>
             <td>${item.count}</td>
-            <td>₱${item.total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td>₱${item.total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
             <td>${pct}%</td>
-            <td>₱${parseFloat(avg).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td>₱${parseFloat(avg).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
         `;
         tableBody.appendChild(tr);
     });
-    
+
     drawIncomeExpenseChart();
     drawCategoryChart(summary, overallExpense);
 }
@@ -690,25 +703,25 @@ function drawIncomeExpenseChart() {
     const ctx = canvas.getContext('2d');
     const width = canvas.width;
     const height = canvas.height;
-    
+
     let income = 0;
     let expenses = 0;
-    
+
     getFilteredTransactions().forEach(t => {
         if (t.type === 'income') income += parseFloat(t.amount);
         else if (t.type === 'expense') expenses += parseFloat(t.amount);
     });
-    
+
     ctx.clearRect(0, 0, width, height);
-    
+
     const maxVal = Math.max(income, expenses, 100);
     const margin = 40;
     const chartHeight = height - margin * 2;
     const barWidth = 60;
-    
+
     const incomeBarHeight = (income / maxVal) * chartHeight;
     const expenseBarHeight = (expenses / maxVal) * chartHeight;
-    
+
     ctx.strokeStyle = '#eeeeee';
     ctx.lineWidth = 1;
     for (let i = 0; i <= 4; i++) {
@@ -718,7 +731,7 @@ function drawIncomeExpenseChart() {
         ctx.lineTo(width - margin, y);
         ctx.stroke();
     }
-    
+
     const x1 = width / 2 - barWidth - 20;
     const y1 = height - margin - incomeBarHeight;
     ctx.fillStyle = '#3e7a4b';
@@ -726,20 +739,20 @@ function drawIncomeExpenseChart() {
     ctx.strokeStyle = 'var(--text-main)';
     ctx.lineWidth = 1.5;
     ctx.strokeRect(x1, y1, barWidth, incomeBarHeight);
-    
+
     const x2 = width / 2 + 20;
     const y2 = height - margin - expenseBarHeight;
     ctx.fillStyle = '#a33e3e';
     ctx.fillRect(x2, y2, barWidth, expenseBarHeight);
     ctx.strokeRect(x2, y2, barWidth, expenseBarHeight);
-    
+
     ctx.fillStyle = 'var(--text-main)';
     ctx.font = 'bold 11px Inter';
     ctx.textAlign = 'center';
-    
+
     ctx.fillText('INCOME', x1 + barWidth / 2, height - margin + 18);
     ctx.fillText('EXPENSES', x2 + barWidth / 2, height - margin + 18);
-    
+
     ctx.font = '10px Inter';
     ctx.fillText(`₱${income.toFixed(2)}`, x1 + barWidth / 2, y1 - 8);
     ctx.fillText(`₱${expenses.toFixed(2)}`, x2 + barWidth / 2, y2 - 8);
@@ -751,24 +764,24 @@ function drawCategoryChart(summary, overallExpense) {
     const ctx = canvas.getContext('2d');
     const width = canvas.width;
     const height = canvas.height;
-    
+
     ctx.clearRect(0, 0, width, height);
-    
+
     const categories = Object.keys(summary);
-    
+
     const centerX = 110;
     const centerY = height / 2;
     const radius = 65;
-    
+
     let startAngle = -Math.PI / 2;
-    
+
     if (overallExpense === 0) {
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
         ctx.strokeStyle = '#cccccc';
         ctx.lineWidth = 15;
         ctx.stroke();
-        
+
         ctx.fillStyle = '#999999';
         ctx.font = '11px Inter';
         ctx.textAlign = 'center';
@@ -776,24 +789,24 @@ function drawCategoryChart(summary, overallExpense) {
         ctx.fillText('NO DATA', centerX, centerY);
         return;
     }
-    
+
     categories.forEach((cat) => {
         const amt = summary[cat].total;
         if (amt === 0) return;
-        
+
         const sliceAngle = (amt / overallExpense) * 2 * Math.PI;
         const endAngle = startAngle + sliceAngle;
-        
+
         const catMeta = categoriesMetadata[cat] || { color: '#888888' };
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius, startAngle, endAngle);
         ctx.strokeStyle = catMeta.color;
         ctx.lineWidth = 18;
         ctx.stroke();
-        
+
         startAngle = endAngle;
     });
-    
+
     ctx.fillStyle = 'var(--text-main)';
     ctx.font = 'bold 11px Inter';
     ctx.textAlign = 'center';
@@ -801,27 +814,27 @@ function drawCategoryChart(summary, overallExpense) {
     ctx.fillText('TOTAL', centerX, centerY - 8);
     ctx.font = '10px Inter';
     ctx.fillText(`₱${overallExpense.toFixed(0)}`, centerX, centerY + 8);
-    
+
     const legendX = 220;
     let legendY = centerY - (categories.length * 20) / 2 + 10;
-    
+
     categories.forEach((cat) => {
         const amt = summary[cat].total;
         const pct = overallExpense > 0 ? Math.round((amt / overallExpense) * 100) : 0;
-        
+
         const catMeta = categoriesMetadata[cat] || { color: '#888888' };
         ctx.fillStyle = catMeta.color;
         ctx.fillRect(legendX, legendY - 8, 10, 10);
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 1;
         ctx.strokeRect(legendX, legendY - 8, 10, 10);
-        
+
         ctx.fillStyle = 'var(--text-main)';
         ctx.font = '10px Inter';
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
         ctx.fillText(`${cat} (${pct}%)`, legendX + 18, legendY - 2);
-        
+
         legendY += 20;
     });
 }
@@ -829,20 +842,20 @@ function drawCategoryChart(summary, overallExpense) {
 function renderProfileView() {
     let totalIncome = 0;
     let totalExpenses = 0;
-    
+
     transactions.forEach(t => {
         if (t.type === 'income') totalIncome += parseFloat(t.amount);
         else if (t.type === 'expense') totalExpenses += parseFloat(t.amount);
     });
-    
+
     const totalSavings = totalIncome - totalExpenses;
-    
+
     document.getElementById('stat-total-count').innerText = transactions.length;
-    document.getElementById('stat-total-income').innerText = `₱${totalIncome.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-    document.getElementById('stat-total-expenses').innerText = `₱${totalExpenses.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-    
+    document.getElementById('stat-total-income').innerText = `₱${totalIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    document.getElementById('stat-total-expenses').innerText = `₱${totalExpenses.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
     const savingsEl = document.getElementById('stat-total-savings');
-    savingsEl.innerText = `${totalSavings < 0 ? '-' : ''}₱${Math.abs(totalSavings).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    savingsEl.innerText = `${totalSavings < 0 ? '-' : ''}₱${Math.abs(totalSavings).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     if (totalSavings < 0) {
         savingsEl.className = 'stat-value text-red';
     } else {
@@ -854,14 +867,14 @@ function initProfileControls() {
     const btnExport = document.getElementById('btn-export-csv');
     const btnResetBudgets = document.getElementById('btn-reset-budgets');
     const btnResetDb = document.getElementById('btn-reset-db');
-    
+
     if (btnExport) {
         btnExport.addEventListener('click', () => {
             if (transactions.length === 0) {
                 alert('No transactions to export.');
                 return;
             }
-            
+
             const headers = ['ID', 'Date', 'Description', 'Category', 'Type', 'Amount'];
             const rows = transactions.map(t => [
                 t.id,
@@ -871,7 +884,7 @@ function initProfileControls() {
                 t.type,
                 t.amount
             ]);
-            
+
             const csvContent = [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
@@ -884,7 +897,7 @@ function initProfileControls() {
             document.body.removeChild(link);
         });
     }
-    
+
     if (btnResetBudgets) {
         btnResetBudgets.addEventListener('click', () => {
             if (confirm('Reset budget limits to default settings?')) {
@@ -897,7 +910,7 @@ function initProfileControls() {
             }
         });
     }
-    
+
     if (btnResetDb) {
         btnResetDb.addEventListener('click', async () => {
             if (transactions.length === 0) {
@@ -908,8 +921,8 @@ function initProfileControls() {
                 try {
                     btnResetDb.innerText = 'Clearing...';
                     btnResetDb.disabled = true;
-                    
-                    const deletePromises = transactions.map(t => 
+
+                    const deletePromises = transactions.map(t =>
                         fetch(`${API}/${t.id}`, { method: 'DELETE' })
                     );
                     await Promise.all(deletePromises);
@@ -986,21 +999,21 @@ async function cycleBillStatus(bill) {
     } else if (bill.status === 'in-progress') {
         nextStatus = 'done';
     }
-    
+
     const updatedBill = { ...bill, status: nextStatus };
-    
+
     let triggerRecurrence = false;
     if (nextStatus === 'done' && updatedBill.recurring && updatedBill.recurring !== 'none' && !updatedBill.recurrenceProcessed) {
         triggerRecurrence = true;
         updatedBill.recurrenceProcessed = true;
     }
-    
+
     await updateBill(bill.id, updatedBill);
-    
+
     if (nextStatus === 'done') {
         await promptAutoExpense(updatedBill);
     }
-    
+
     if (triggerRecurrence) {
         await generateNextRecurringInstance(updatedBill);
     }
@@ -1014,7 +1027,7 @@ async function promptAutoExpense(bill) {
         const mm = String(today.getMonth() + 1).padStart(2, '0');
         const dd = String(today.getDate()).padStart(2, '0');
         const currentDate = `${yyyy}-${mm}-${dd}`;
-        
+
         const newTransaction = {
             id: String(Date.now()),
             date: currentDate,
@@ -1023,7 +1036,7 @@ async function promptAutoExpense(bill) {
             type: 'expense',
             amount: parseFloat(bill.amount) || 0
         };
-        
+
         await addTransaction(newTransaction);
         alert('Expense transaction logged successfully!');
     }
@@ -1041,7 +1054,7 @@ function startEditBill(bill) {
     billForm.dueDate.value = bill.dueDate || '';
     billForm.amount.value = bill.amount;
     billForm.recurring.value = bill.recurring || 'none';
-    
+
     document.getElementById('bill-form-title').innerText = 'EDIT BILL';
     document.getElementById('bill-submit-btn').innerText = 'Update Bill';
     document.getElementById('cancel-bill-edit-btn').style.display = 'block';
@@ -1074,13 +1087,13 @@ function getNextDueDate(dateStr, frequency) {
     if (!dateStr) return '';
     const date = new Date(dateStr + 'T00:00:00');
     if (isNaN(date.getTime())) return dateStr;
-    
+
     if (frequency === 'monthly') {
         date.setMonth(date.getMonth() + 1);
     } else if (frequency === 'yearly') {
         date.setFullYear(date.getFullYear() + 1);
     }
-    
+
     const yyyy = date.getFullYear();
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const dd = String(date.getDate()).padStart(2, '0');
@@ -1099,7 +1112,7 @@ async function generateNextRecurringInstance(bill) {
         amount: bill.amount,
         recurring: bill.recurring
     };
-    
+
     await addBill(nextBill);
     alert(`Recurring bill "${bill.title}" has been settled. A new pending bill has been generated for the next period (${nextDueDate}).`);
 }
@@ -1107,32 +1120,42 @@ async function generateNextRecurringInstance(bill) {
 function renderBillsView() {
     const tableBody = document.getElementById('bills-list-table-body');
     if (!tableBody) return;
-    
+
     tableBody.innerHTML = '';
-    
+
     let totalOutstanding = 0;
+    let totalSettled = 0;
     let pendingCount = 0;
     let settledCount = 0;
-    
+    let nextDueBill = null;
+
     bills.forEach(bill => {
         const isSettled = bill.status === 'done';
         const amt = parseFloat(bill.amount) || 0;
-        
+
         if (isSettled) {
             settledCount++;
+            totalSettled += amt;
         } else {
             pendingCount++;
             totalOutstanding += amt;
+
+            // Find the pending/in-progress bill with the earliest due date
+            if (bill.dueDate) {
+                if (!nextDueBill || new Date(bill.dueDate) < new Date(nextDueBill.dueDate)) {
+                    nextDueBill = bill;
+                }
+            }
         }
-        
+
         const tr = document.createElement('tr');
-        
+
         const statusClass = `status-${bill.status}`;
         const priorityClass = `priority-${bill.priority}`;
-        
-        const formattedAmount = `₱${amt.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+        const formattedAmount = `₱${amt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         const recurringLabel = bill.recurring && bill.recurring !== 'none' ? `⟳ ${bill.recurring}` : 'One-time';
-        
+
         tr.innerHTML = `
             <td>
                 <strong>${bill.title}</strong><br>
@@ -1150,41 +1173,65 @@ function renderBillsView() {
                 </div>
             </td>
         `;
-        
+
         tr.querySelector('.del-btn').addEventListener('click', () => {
             if (confirm(`Delete the bill "${bill.title}"?`)) {
                 deleteBill(bill.id);
             }
         });
-        
+
         tr.querySelector('.edit-btn').addEventListener('click', () => {
             startEditBill(bill);
         });
-        
+
         tr.querySelector('.status-badge').addEventListener('click', () => {
             cycleBillStatus(bill);
         });
-        
+
         tableBody.appendChild(tr);
     });
-    
-    const formatCurrency = (num) => '₱' + num.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-    document.getElementById('bills-total-outstanding').innerText = formatCurrency(totalOutstanding);
-    document.getElementById('bills-pending-count').innerText = pendingCount;
-    
+
+    const formatCurrency = (num) => '₱' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    const outstandingEl = document.getElementById('bills-total-outstanding');
+    if (outstandingEl) outstandingEl.innerText = formatCurrency(totalOutstanding);
+
+    const settledEl = document.getElementById('bills-total-settled');
+    if (settledEl) settledEl.innerText = formatCurrency(totalSettled);
+
+    const pendingEl = document.getElementById('bills-pending-count');
+    if (pendingEl) pendingEl.innerText = pendingCount;
+
+    const nextDueEl = document.getElementById('bills-next-due');
+    if (nextDueEl) {
+        if (nextDueBill) {
+            const dateObj = new Date(nextDueBill.dueDate);
+            const options = { month: 'short', day: 'numeric' };
+            const formattedDate = isNaN(dateObj) ? nextDueBill.dueDate : dateObj.toLocaleDateString('en-US', options);
+            nextDueEl.innerHTML = `${nextDueBill.title}<br><span style="font-size: 11px; color: var(--text-muted); font-weight: 500;">Due ${formattedDate} (${formatCurrency(nextDueBill.amount)})</span>`;
+            nextDueEl.style.whiteSpace = 'normal';
+        } else {
+            nextDueEl.innerText = 'None Pending';
+            nextDueEl.style.color = 'var(--text-muted)';
+        }
+    }
+
     const totalBills = bills.length;
     const settledPct = totalBills > 0 ? Math.round((settledCount / totalBills) * 100) : 0;
-    
-    document.getElementById('bills-progress-pct').innerText = `${settledPct}% Settled`;
-    document.getElementById('bills-progress-bar').style.width = `${settledPct}%`;
+
+    const progressPctEl = document.getElementById('bills-progress-pct');
+    if (progressPctEl) progressPctEl.innerText = `${settledPct}% Settled`;
+
+    const progressBarEl = document.getElementById('bills-progress-bar');
+    if (progressBarEl) progressBarEl.style.width = `${settledPct}%`;
 }
 
 function initBillsForm() {
     if (!billForm) return;
-    
+
     billForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const billData = {
             title: billForm.title.value.trim(),
             description: billForm.description.value.trim(),
@@ -1194,27 +1241,27 @@ function initBillsForm() {
             amount: parseFloat(billForm.amount.value),
             recurring: billForm.recurring.value
         };
-        
+
         if (!billData.title || isNaN(billData.amount)) {
             alert('Please fill out the form correctly.');
             return;
         }
-        
+
         if (editingBillId) {
             const updatedBill = { id: editingBillId, ...billData };
-            
+
             let triggerRecurrence = false;
             const prevBill = bills.find(b => b.id === editingBillId);
             const wasDone = prevBill ? prevBill.status === 'done' : false;
             const isDone = billData.status === 'done';
-            
+
             if (isDone && !wasDone && billData.recurring && billData.recurring !== 'none' && !prevBill?.recurrenceProcessed) {
                 triggerRecurrence = true;
                 updatedBill.recurrenceProcessed = true;
             } else if (prevBill) {
                 updatedBill.recurrenceProcessed = prevBill.recurrenceProcessed;
             }
-            
+
             await updateBill(editingBillId, updatedBill);
             if (isDone) {
                 await promptAutoExpense(updatedBill);
@@ -1228,13 +1275,13 @@ function initBillsForm() {
                 id: 'bill-' + Date.now(),
                 ...billData
             };
-            
+
             let triggerRecurrence = false;
             if (newBill.status === 'done' && newBill.recurring && newBill.recurring !== 'none') {
                 triggerRecurrence = true;
                 newBill.recurrenceProcessed = true;
             }
-            
+
             await addBill(newBill);
             if (newBill.status === 'done') {
                 await promptAutoExpense(newBill);
@@ -1245,7 +1292,7 @@ function initBillsForm() {
             resetBillForm();
         }
     });
-    
+
     const cancelBtn = document.getElementById('cancel-bill-edit-btn');
     if (cancelBtn) {
         cancelBtn.addEventListener('click', cancelEditBill);
@@ -1309,7 +1356,7 @@ async function cycleWantStatus(want) {
     const nextStatus = want.status === 'wanted' ? 'bought' : 'wanted';
     const updatedWant = { ...want, status: nextStatus };
     await updateWant(want.id, updatedWant);
-    
+
     if (nextStatus === 'bought') {
         await promptAutoExpenseWant(updatedWant);
     }
@@ -1323,7 +1370,7 @@ async function promptAutoExpenseWant(want) {
         const mm = String(today.getMonth() + 1).padStart(2, '0');
         const dd = String(today.getDate()).padStart(2, '0');
         const currentDate = `${yyyy}-${mm}-${dd}`;
-        
+
         const newTransaction = {
             id: String(Date.now()),
             date: currentDate,
@@ -1332,7 +1379,7 @@ async function promptAutoExpenseWant(want) {
             type: 'expense',
             amount: parseFloat(want.amount) || 0
         };
-        
+
         await addTransaction(newTransaction);
         alert('Expense transaction logged successfully!');
     }
@@ -1347,7 +1394,7 @@ function startEditWant(want) {
     wantForm.amount.value = want.amount;
     wantForm.priority.value = want.priority;
     wantForm.status.value = want.status;
-    
+
     document.getElementById('want-form-title').innerText = 'EDIT WANT';
     document.getElementById('want-submit-btn').innerText = 'Update Want';
     document.getElementById('cancel-want-edit-btn').style.display = 'block';
@@ -1370,7 +1417,7 @@ function cancelEditWant() {
 function renderWantsView() {
     let totalIncome = 0;
     let totalExpenses = 0;
-    
+
     transactions.forEach(t => {
         if (t.type === 'income') {
             totalIncome += parseFloat(t.amount);
@@ -1378,46 +1425,46 @@ function renderWantsView() {
             totalExpenses += parseFloat(t.amount);
         }
     });
-    
+
     const totalBalance = totalIncome - totalExpenses;
     const allocableBudget = Math.max(0, totalBalance * (wantsAllocationPct / 100));
-    
+
     let activeWantsTotal = 0;
     wants.forEach(w => {
         if (w.status === 'wanted') {
             activeWantsTotal += parseFloat(w.amount) || 0;
         }
     });
-    
-    const formatCurrency = (num) => '₱' + num.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-    
+
+    const formatCurrency = (num) => '₱' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
     document.getElementById('wants-total-balance').innerText = formatCurrency(totalBalance);
     document.getElementById('wants-allocable-budget').innerText = formatCurrency(allocableBudget);
     document.getElementById('wants-active-cost').innerText = formatCurrency(activeWantsTotal);
-    
+
     document.getElementById('wants-allocation-slider').value = wantsAllocationPct;
     document.getElementById('wants-allocation-input').value = wantsAllocationPct;
     document.getElementById('wants-pct-label').innerText = `${wantsAllocationPct}%`;
-    
+
     const tableBody = document.getElementById('wants-list-table-body');
     if (!tableBody) return;
     tableBody.innerHTML = '';
-    
+
     wants.forEach(want => {
         const amt = parseFloat(want.amount) || 0;
-        const formattedAmount = `₱${amt.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-        
+        const formattedAmount = `₱${amt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
         const priorityClass = `priority-${want.priority}`;
         const statusClass = want.status === 'bought' ? 'status-bought' : 'status-wanted';
         const statusText = want.status === 'bought' ? 'Bought' : 'Wanted';
-        
+
         const tr = document.createElement('tr');
-        
+
         const isAffordable = want.status === 'wanted' && amt <= allocableBudget;
         if (isAffordable) {
             tr.className = 'affordable-want';
         }
-        
+
         tr.innerHTML = `
             <td><strong>${want.title}</strong></td>
             <td>${formattedAmount}</td>
@@ -1430,43 +1477,43 @@ function renderWantsView() {
                 </div>
             </td>
         `;
-        
+
         tr.querySelector('.del-btn').addEventListener('click', () => {
             if (confirm(`Delete want "${want.title}"?`)) {
                 deleteWant(want.id);
             }
         });
-        
+
         tr.querySelector('.edit-btn').addEventListener('click', () => {
             startEditWant(want);
         });
-        
+
         tr.querySelector('.status-badge').addEventListener('click', () => {
             cycleWantStatus(want);
         });
-        
+
         tableBody.appendChild(tr);
     });
 }
 
 function initWantsForm() {
     if (!wantForm) return;
-    
+
     wantForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const wantData = {
             title: wantForm.title.value.trim(),
             amount: parseFloat(wantForm.amount.value),
             priority: wantForm.priority.value,
             status: wantForm.status.value
         };
-        
+
         if (!wantData.title || isNaN(wantData.amount)) {
             alert('Please fill out the form correctly.');
             return;
         }
-        
+
         if (editingWantId) {
             const updatedWant = { id: editingWantId, ...wantData };
             await updateWant(editingWantId, updatedWant);
@@ -1486,7 +1533,7 @@ function initWantsForm() {
             resetWantForm();
         }
     });
-    
+
     const cancelBtn = document.getElementById('cancel-want-edit-btn');
     if (cancelBtn) {
         cancelBtn.addEventListener('click', cancelEditWant);
@@ -1497,30 +1544,30 @@ function initWantsAllocationControls() {
     const slider = document.getElementById('wants-allocation-slider');
     const numberInput = document.getElementById('wants-allocation-input');
     const label = document.getElementById('wants-pct-label');
-    
+
     if (!slider || !numberInput) return;
-    
+
     function updateAllocation(val) {
         let pct = parseInt(val);
         if (isNaN(pct)) pct = 10;
         pct = Math.max(0, Math.min(100, pct));
-        
+
         wantsAllocationPct = pct;
         localStorage.setItem('nothing_budget_wants_pct', pct);
-        
+
         slider.value = pct;
         numberInput.value = pct;
         if (label) label.innerText = `${pct}%`;
-        
+
         if (currentView === 'wants') {
             renderWantsView();
         }
     }
-    
+
     slider.addEventListener('input', (e) => {
         updateAllocation(e.target.value);
     });
-    
+
     numberInput.addEventListener('input', (e) => {
         updateAllocation(e.target.value);
     });
@@ -1560,7 +1607,7 @@ const views = {
 
 function switchView(viewName) {
     const vName = viewName.toLowerCase();
-    
+
     // Handle coming soon tabs
     if (vName === 'goals' || vName === 'reports') {
         currentView = vName;
@@ -1569,7 +1616,7 @@ function switchView(viewName) {
             if (views[v].el) views[v].el.style.display = 'none';
         });
         document.getElementById('page-title').innerHTML = `${vName.toUpperCase()}<br><span id="current-month-display">COMING SOON</span>`;
-        
+
         // Update top menu active class
         document.querySelectorAll('.top-menu li').forEach(li => {
             if (li.innerText.trim().toLowerCase() === vName) {
@@ -1583,19 +1630,19 @@ function switchView(viewName) {
 
     if (!views[vName]) return;
     currentView = vName;
-    
+
     // Hide all views
     Object.keys(views).forEach(v => {
         if (views[v].el) {
             views[v].el.style.display = 'none';
         }
     });
-    
+
     // Dashboard shows both cards and transactions table
     if (currentView === 'dashboard') {
         if (views.dashboard.el) views.dashboard.el.style.display = 'block';
         if (views.transactions.el) views.transactions.el.style.display = 'block';
-        
+
         // Hide Filter & Sort on Dashboard and make Quick Add span full width
         const filterSection = document.getElementById('filter-sort-section');
         const transGrid = document.getElementById('transaction-grid');
@@ -1605,7 +1652,7 @@ function switchView(viewName) {
         if (views[currentView] && views[currentView].el) {
             views[currentView].el.style.display = 'block';
         }
-        
+
         // Ensure Filter & Sort is visible and styled as 2 columns on Transactions view
         if (currentView === 'transactions') {
             const filterSection = document.getElementById('filter-sort-section');
@@ -1614,7 +1661,7 @@ function switchView(viewName) {
             if (transGrid) transGrid.style.gridTemplateColumns = '1fr 1fr';
         }
     }
-    
+
     // Update title text
     const titleText = views[currentView].title;
     if (currentMonth) {
@@ -1625,7 +1672,7 @@ function switchView(viewName) {
     } else {
         document.getElementById('page-title').innerHTML = `${titleText}<br><span id="current-month-display"></span>`;
     }
-    
+
     // Update sidebar links active class
     document.querySelectorAll('.nav-links li').forEach(li => {
         const viewAttr = li.getAttribute('data-view');
@@ -1635,7 +1682,7 @@ function switchView(viewName) {
             li.classList.remove('active');
         }
     });
-    
+
     // Update top menu active class
     document.querySelectorAll('.top-menu li').forEach(li => {
         const text = li.innerText.trim().toLowerCase();
@@ -1685,7 +1732,7 @@ document.getElementById('month-filter').addEventListener('change', (e) => {
     renderTransactions();
     updateDashboard();
     drawSparkline();
-    
+
     // Update subviews if active
     if (currentView === 'budgets') renderBudgetsView();
     else if (currentView === 'analytics') renderAnalyticsView();
