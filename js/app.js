@@ -2,41 +2,21 @@
 let dbMode = 'json-server'; // 'json-server' or 'localstorage'
 
 const SEED_DATA = {
-    transactions: [
-        { id: "1", date: "2023-12-11", description: "Rent", category: "Housing & Rent", type: "expense", amount: 1500 },
-        { id: "2", date: "2023-12-13", description: "Salary", category: "Salary & Income", type: "income", amount: 4200 },
-        { id: "3", date: "2023-12-14", description: "Spotify", category: "Subscriptions", type: "expense", amount: 11.99 },
-        { id: "mxwfGVy73ak", date: "2026-06-02", description: "spotify", category: "Subscriptions", type: "expense", amount: 23 },
-        { id: "46GcyNTC3AU", date: "2026-06-01", description: "mcdo", category: "Food & Dining", type: "expense", amount: 160 },
-        { id: "74jYoKr1LYQ", date: "2026-06-01", description: "income", category: "Salary & Income", type: "income", amount: 1000 },
-        { id: "C4WiuDRRgo0", date: "2026-06-01", description: "jeep", category: "Transportation", type: "expense", amount: 20 },
-        { id: "2nJQmS357KQ", date: "2026-06-01", description: "income", category: "Salary & Income", type: "income", amount: 5000 },
-        { id: "NkapqKzo0kw", date: "2026-06-01", description: "keyboard", category: "Shopping & Wants", type: "expense", amount: 5000 },
-        { id: "77pPMXJWLCA", date: "2026-06-01", description: "MOVIE", category: "Entertainment", type: "expense", amount: 290 },
-        { id: "MsJC6mqqWxs", date: "2026-06-01", description: "BONUS", category: "Salary & Income", type: "income", amount: 10000 },
-        { id: "-EG5TCVjF-Y", date: "2026-06-01", description: "Premium Coffee Beans", category: "Shopping & Wants", type: "expense", amount: 1500 }
-    ],
-    bills: [
-        { id: "bill-1", title: "Apartment Rent", description: "Monthly rent for apartment unit.", priority: "high", status: "pending", dueDate: "2026-06-05", amount: 4500, recurring: "monthly", recurrenceProcessed: true },
-        { id: "bill-2", title: "Internet Connection", description: "Fiber internet broadband monthly subscription.", priority: "medium", status: "in-progress", dueDate: "2026-06-10", amount: 49.99, recurring: "monthly" },
-        { id: "bill-3", title: "Gym Membership", description: "Monthly health club/gym access fee.", priority: "low", status: "done", dueDate: "2026-06-12", amount: 29.99, recurring: "monthly" }
-    ],
-    wants: [
-        { id: "want-1", title: "Mechanical Keyboard", amount: 3000, priority: "medium", status: "wanted" },
-        { id: "want-2", title: "Wireless Earbuds", amount: 3700, priority: "low", status: "wanted" },
-        { id: "want-3", title: "Premium Coffee Beans", amount: 1500, priority: "high", status: "bought" }
-    ]
+    transactions: [],
+    bills: [],
+    wants: []
 };
 
 function initLocalStorageData() {
-    if (!localStorage.getItem('nothing_budget_transactions')) {
-        localStorage.setItem('nothing_budget_transactions', JSON.stringify(SEED_DATA.transactions));
+    // Seed Guest data
+    if (!localStorage.getItem('nothing_budget_transactions_guest')) {
+        localStorage.setItem('nothing_budget_transactions_guest', JSON.stringify(SEED_DATA.transactions));
     }
-    if (!localStorage.getItem('nothing_budget_bills')) {
-        localStorage.setItem('nothing_budget_bills', JSON.stringify(SEED_DATA.bills));
+    if (!localStorage.getItem('nothing_budget_bills_guest')) {
+        localStorage.setItem('nothing_budget_bills_guest', JSON.stringify(SEED_DATA.bills));
     }
-    if (!localStorage.getItem('nothing_budget_wants')) {
-        localStorage.setItem('nothing_budget_wants', JSON.stringify(SEED_DATA.wants));
+    if (!localStorage.getItem('nothing_budget_wants_guest')) {
+        localStorage.setItem('nothing_budget_wants_guest', JSON.stringify(SEED_DATA.wants));
     }
 }
 
@@ -74,7 +54,7 @@ async function toggleDatabaseMode() {
         toggleBtn.disabled = true;
         
         try {
-            const res = await originalFetch('http://localhost:3000/transactions?_limit=1');
+            const res = await originalFetch(`${API_BASE_URL}/transactions?_limit=1`);
             if (res.ok) {
                 dbMode = 'json-server';
                 updateDatabaseStatusUI();
@@ -83,7 +63,7 @@ async function toggleDatabaseMode() {
                 throw new Error('Server returned error status');
             }
         } catch (err) {
-            alert('Could not connect to JSON-Server. Make sure it is running via "json-server --watch db.json --port 3000"!');
+            alert(`Could not connect to Server. Make sure it is running at ${API_BASE_URL}!`);
             dbMode = 'localstorage';
             updateDatabaseStatusUI();
         } finally {
@@ -105,7 +85,7 @@ async function detectDatabaseMode() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 1500); // 1.5s timeout
         
-        const res = await originalFetch('http://localhost:3000/transactions?_limit=1', { signal: controller.signal });
+        const res = await originalFetch(`${API_BASE_URL}/transactions?_limit=1`, { signal: controller.signal });
         clearTimeout(timeoutId);
         
         if (res.ok) {
@@ -125,33 +105,151 @@ const originalFetch = window.fetch;
 async function customFetch(url, options = {}) {
     const urlStr = typeof url === 'string' ? url : (url instanceof URL ? url.href : '');
     
-    if (!urlStr.startsWith('http://localhost:3000')) {
+    if (!urlStr.startsWith(API_BASE_URL)) {
         return originalFetch(url, options);
     }
     
     const method = (options.method || 'GET').toUpperCase();
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    const username = localStorage.getItem('username') || '';
     
-    if (dbMode === 'json-server') {
-        try {
-            return await originalFetch(url, options);
-        } catch (err) {
-            console.warn("JSON-Server not reachable. Switching to LocalStorage mode.", err);
-            dbMode = 'localstorage';
-            initLocalStorageData();
-            updateDatabaseStatusUI();
+    const urlPath = urlStr.replace(API_BASE_URL, '').replace(/^\/+/, '');
+    const pathParts = urlPath.split('?')[0].split('/'); // Ignore query string
+    const resource = pathParts[0]; // "transactions", "bills", "wants", or "users"
+    const id = pathParts[1]; // undefined or the ID string
+    
+    // --- AUTHENTICATION ENDPOINTS (/users) ---
+    if (resource === 'users') {
+        if (dbMode === 'json-server') {
+            return originalFetch(url, options);
+        } else {
+            // LocalStorage Mock for /users
+            const users = JSON.parse(localStorage.getItem('nothing_budget_users')) || [];
+            let responseData = null;
+            let status = 200;
+            
+            if (method === 'GET') {
+                if (id) {
+                    const user = users.find(u => u.id.toLowerCase() === decodeURIComponent(id).toLowerCase());
+                    if (user) {
+                        responseData = user;
+                    } else {
+                        status = 404;
+                        responseData = { error: 'Not found' };
+                    }
+                } else {
+                    responseData = users;
+                }
+            } else if (method === 'POST') {
+                const body = JSON.parse(options.body);
+                const exists = users.some(u => u.id.toLowerCase() === body.id.toLowerCase());
+                if (exists) {
+                    status = 400;
+                    responseData = { error: 'User exists' };
+                } else {
+                    users.push(body);
+                    localStorage.setItem('nothing_budget_users', JSON.stringify(users));
+                    responseData = body;
+                    status = 201;
+                }
+            }
+            return {
+                ok: status >= 200 && status < 300,
+                status: status,
+                json: async () => responseData,
+                text: async () => JSON.stringify(responseData)
+            };
         }
     }
     
-    // LocalStorage fallback
-    initLocalStorageData();
-    updateDatabaseStatusUI();
+    // --- DATA ENDPOINTS (transactions, bills, wants) ---
+    // 1. Guest Mode: Serve entirely from local guest keys
+    if (!isLoggedIn) {
+        const storageKey = `nothing_budget_${resource}_guest`;
+        let data = JSON.parse(localStorage.getItem(storageKey)) || [];
+        
+        let responseData = null;
+        let status = 200;
+        
+        if (method === 'GET') {
+            if (id) {
+                const item = data.find(i => String(i.id) === String(id));
+                if (item) responseData = item;
+                else {
+                    status = 404;
+                    responseData = { error: 'Not found' };
+                }
+            } else {
+                responseData = data;
+            }
+        } else if (method === 'POST') {
+            const body = JSON.parse(options.body);
+            data.push(body);
+            localStorage.setItem(storageKey, JSON.stringify(data));
+            responseData = body;
+            status = 201;
+        } else if (method === 'PUT') {
+            const body = JSON.parse(options.body);
+            const index = data.findIndex(i => String(i.id) === String(id));
+            if (index !== -1) {
+                data[index] = { ...data[index], ...body };
+                localStorage.setItem(storageKey, JSON.stringify(data));
+                responseData = data[index];
+            } else {
+                status = 404;
+                responseData = { error: 'Not found' };
+            }
+        } else if (method === 'DELETE') {
+            const index = data.findIndex(i => String(i.id) === String(id));
+            if (index !== -1) {
+                const deletedItem = data.splice(index, 1)[0];
+                localStorage.setItem(storageKey, JSON.stringify(data));
+                responseData = deletedItem;
+            } else {
+                status = 404;
+                responseData = { error: 'Not found' };
+            }
+        }
+        
+        return {
+            ok: status >= 200 && status < 300,
+            status: status,
+            json: async () => responseData,
+            text: async () => JSON.stringify(responseData)
+        };
+    }
     
-    const urlPath = urlStr.replace('http://localhost:3000/', '');
-    const pathParts = urlPath.split('?')[0].split('/'); // Ignore query string
-    const resource = pathParts[0]; // "transactions", "bills", or "wants"
-    const id = pathParts[1]; // undefined or the ID string
+    // 2. Logged In Mode
+    if (dbMode === 'json-server') {
+        // SERVER MODE: Append userId to operations
+        let modifiedUrl = urlStr;
+        let modifiedOptions = { ...options };
+        
+        if (method === 'GET') {
+            if (!id) {
+                const separator = urlStr.includes('?') ? '&' : '?';
+                modifiedUrl = `${urlStr}${separator}userId=${encodeURIComponent(username)}`;
+            }
+        } else if (method === 'POST' || method === 'PUT') {
+            if (options.body) {
+                const body = JSON.parse(options.body);
+                body.userId = username;
+                modifiedOptions.body = JSON.stringify(body);
+            }
+        }
+        
+        try {
+            return await originalFetch(modifiedUrl, modifiedOptions);
+        } catch (err) {
+            console.warn("Server connection failed. Switching to user LocalStorage mode.", err);
+            dbMode = 'localstorage';
+            updateDatabaseStatusUI();
+            // fall through to localstorage handler below
+        }
+    }
     
-    const storageKey = `nothing_budget_${resource}`;
+    // LocalStorage Mode for User: Partitions data by username
+    const storageKey = `nothing_budget_${resource}_user_${username}`;
     let data = JSON.parse(localStorage.getItem(storageKey)) || [];
     
     let responseData = null;
@@ -160,9 +258,8 @@ async function customFetch(url, options = {}) {
     if (method === 'GET') {
         if (id) {
             const item = data.find(i => String(i.id) === String(id));
-            if (item) {
-                responseData = item;
-            } else {
+            if (item) responseData = item;
+            else {
                 status = 404;
                 responseData = { error: 'Not found' };
             }
@@ -207,9 +304,10 @@ async function customFetch(url, options = {}) {
 }
 window.fetch = customFetch;
 
-const API = 'http://localhost:3000/transactions';
-const BILLS_API = 'http://localhost:3000/bills';
-const WANTS_API = 'http://localhost:3000/wants';
+let API_BASE_URL = localStorage.getItem('nothing_budget_api_url') || 'http://localhost:8080';
+let API = `${API_BASE_URL}/transactions`;
+let BILLS_API = `${API_BASE_URL}/bills`;
+let WANTS_API = `${API_BASE_URL}/wants`;
 const form = document.getElementById('transaction-form');
 const list = document.getElementById('transaction-list');
 
@@ -1063,6 +1161,38 @@ function drawCategoryChart(summary, overallExpense) {
     });
 }
 // --- Profile Tab Logic ---
+function updateUserProfileUI() {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    const username = localStorage.getItem('username') || 'Guest';
+    
+    // Header avatar
+    const avatarEl = document.querySelector('.avatar');
+    if (avatarEl) {
+        avatarEl.innerText = username.charAt(0).toUpperCase();
+    }
+
+    // Profile page details
+    const profileNameEl = document.querySelector('.profile-name');
+    if (profileNameEl) {
+        profileNameEl.innerText = username;
+    }
+    const avatarLargeEl = document.querySelector('.profile-avatar-large');
+    if (avatarLargeEl) {
+        avatarLargeEl.innerText = username.charAt(0).toUpperCase();
+    }
+
+    const statusEl = document.querySelector('.profile-status');
+    if (statusEl) {
+        if (isLoggedIn) {
+            statusEl.innerText = 'Active Profile';
+            statusEl.style.color = 'var(--accent-green)';
+        } else {
+            statusEl.innerText = 'Guest Session';
+            statusEl.style.color = 'var(--text-muted)';
+        }
+    }
+}
+
 function renderProfileView() {
     let totalIncome = 0;
     let totalExpenses = 0;
@@ -1085,12 +1215,32 @@ function renderProfileView() {
     } else {
         savingsEl.className = 'stat-value text-green';
     }
+
+    updateUserProfileUI();
 }
 
 function initProfileControls() {
     const btnExport = document.getElementById('btn-export-csv');
     const btnResetBudgets = document.getElementById('btn-reset-budgets');
     const btnResetDb = document.getElementById('btn-reset-db');
+    const btnLogoutSidebar = document.getElementById('btn-logout');
+    const btnLogoutProfile = document.getElementById('btn-profile-logout');
+
+    const handleLogout = () => {
+        if (confirm('Are you sure you want to log out?')) {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('username');
+            window.location.href = 'login.html';
+        }
+    };
+    window.handleLogout = handleLogout; // Expose for sidebar sync button usage
+
+    if (btnLogoutSidebar) {
+        btnLogoutSidebar.addEventListener('click', handleLogout);
+    }
+    if (btnLogoutProfile) {
+        btnLogoutProfile.addEventListener('click', handleLogout);
+    }
 
     if (btnExport) {
         btnExport.addEventListener('click', () => {
@@ -1137,25 +1287,39 @@ function initProfileControls() {
 
     if (btnResetDb) {
         btnResetDb.addEventListener('click', async () => {
-            if (transactions.length === 0) {
-                alert('Database is already empty.');
+            const hasData = transactions.length > 0 || bills.length > 0 || wants.length > 0 ||
+                            localStorage.getItem('nothing_budget_transactions_guest') ||
+                            localStorage.getItem('nothing_budget_bills_guest') ||
+                            localStorage.getItem('nothing_budget_wants_guest');
+            if (!hasData) {
+                alert('Database and local guest session are already empty.');
                 return;
             }
-            if (confirm('WARNING: Are you sure you want to permanently delete ALL transactions? This cannot be undone.')) {
+            if (confirm('WARNING: Are you sure you want to permanently delete ALL transactions, bills, and wants? This cannot be undone.')) {
                 try {
                     btnResetDb.innerText = 'Clearing...';
                     btnResetDb.disabled = true;
 
-                    const deletePromises = transactions.map(t =>
-                        fetch(`${API}/${t.id}`, { method: 'DELETE' })
-                    );
-                    await Promise.all(deletePromises);
-                    await loadTransactions();
-                    alert('All transactions cleared.');
+                    // Delete all transactions
+                    const deleteTPromises = transactions.map(t => fetch(`${API}/${t.id}`, { method: 'DELETE' }));
+                    // Delete all bills
+                    const deleteBPromises = bills.map(b => fetch(`${BILLS_API}/${b.id}`, { method: 'DELETE' }));
+                    // Delete all wants
+                    const deleteWPromises = wants.map(w => fetch(`${WANTS_API}/${w.id}`, { method: 'DELETE' }));
+
+                    await Promise.all([...deleteTPromises, ...deleteBPromises, ...deleteWPromises]);
+                    
+                    // Clear local guest keys
+                    localStorage.removeItem('nothing_budget_transactions_guest');
+                    localStorage.removeItem('nothing_budget_bills_guest');
+                    localStorage.removeItem('nothing_budget_wants_guest');
+
+                    await reloadAllData();
+                    alert('All database records and local guest sessions cleared.');
                 } catch (err) {
-                    alert('Failed to clear database: ' + err.message);
+                    alert('Failed to clear data: ' + err.message);
                 } finally {
-                    btnResetDb.innerText = 'Clear All Transactions';
+                    btnResetDb.innerText = 'Clear All Data';
                     btnResetDb.disabled = false;
                 }
             }
@@ -1981,8 +2145,130 @@ document.getElementById('month-filter').addEventListener('change', (e) => {
     else if (currentView === 'wants') renderWantsView();
 });
 
+// Brutalist Toast Notification System Helper
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    
+    const icon = type === 'success' ? '✔' : '✖';
+    toast.innerHTML = `<span style="font-size: 14px;">${icon}</span><span>${message}</span>`;
+    
+    container.appendChild(toast);
+    
+    // Automatically fade out and remove
+    setTimeout(() => {
+        toast.style.transform = 'translateY(10px)';
+        toast.style.opacity = '0';
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }, 3200);
+}
+
+// User Status UI Helper
+function updateUserStatusUI() {
+    const dot = document.getElementById('user-status-dot');
+    const text = document.getElementById('user-status-text');
+    const syncBtn = document.getElementById('btn-sync-action');
+    
+    if (!dot || !text || !syncBtn) return;
+    
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    const username = localStorage.getItem('username') || '';
+    
+    if (isLoggedIn) {
+        dot.style.backgroundColor = '#10b981'; // Green
+        text.innerText = `User: ${username}`;
+        syncBtn.innerText = 'Log Out';
+    } else {
+        dot.style.backgroundColor = '#ef4444'; // Red
+        text.innerText = 'Guest Mode';
+        syncBtn.innerText = 'Sign In / Register';
+    }
+}
+
+// Monkeytype-style data sync helper
+async function syncGuestData() {
+    const username = localStorage.getItem('username');
+    if (!username) return;
+
+    const transactionsGuest = JSON.parse(localStorage.getItem('nothing_budget_transactions_guest')) || [];
+    const billsGuest = JSON.parse(localStorage.getItem('nothing_budget_bills_guest')) || [];
+    const wantsGuest = JSON.parse(localStorage.getItem('nothing_budget_wants_guest')) || [];
+
+    let syncCount = 0;
+
+    try {
+        // 1. Sync Transactions
+        const userTRes = await fetch(API);
+        const existingUserT = userTRes.ok ? await userTRes.json() : [];
+        const existingTIds = new Set(existingUserT.map(t => String(t.id)));
+
+        for (const t of transactionsGuest) {
+            if (existingTIds.has(String(t.id))) continue;
+            const syncedT = { ...t };
+            await fetch(API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(syncedT)
+            });
+            syncCount++;
+        }
+
+        // 2. Sync Bills
+        const userBRes = await fetch(BILLS_API);
+        const existingUserB = userBRes.ok ? await userBRes.json() : [];
+        const existingBIds = new Set(existingUserB.map(b => String(b.id)));
+
+        for (const b of billsGuest) {
+            if (existingBIds.has(String(b.id))) continue;
+            const syncedB = { ...b };
+            await fetch(BILLS_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(syncedB)
+            });
+            syncCount++;
+        }
+
+        // 3. Sync Wants
+        const userWRes = await fetch(WANTS_API);
+        const existingUserW = userWRes.ok ? await userWRes.json() : [];
+        const existingWIds = new Set(existingUserW.map(w => String(w.id)));
+
+        for (const w of wantsGuest) {
+            if (existingWIds.has(String(w.id))) continue;
+            const syncedW = { ...w };
+            await fetch(WANTS_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(syncedW)
+            });
+            syncCount++;
+        }
+
+        if (syncCount > 0) {
+            showToast(`SYNCED ${syncCount} LOCAL ITEMS TO YOUR ACCOUNT!`);
+        }
+    } catch (err) {
+        console.error('Data sync failed:', err);
+        showToast('DATA SYNC FAILED. WILL RETRY LATER.', 'error');
+    } finally {
+        localStorage.removeItem('nothing_budget_transactions_guest');
+        localStorage.removeItem('nothing_budget_bills_guest');
+        localStorage.removeItem('nothing_budget_wants_guest');
+        localStorage.removeItem('sync_pending');
+        await reloadAllData();
+    }
+}
+
 // Initialize App
 document.addEventListener('DOMContentLoaded', async () => {
+    updateUserProfileUI();
+    updateUserStatusUI();
     populateCategoryDropdowns();
     initBudgetsForm();
     initProfileControls();
@@ -1997,7 +2283,60 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Detect database mode first
     await detectDatabaseMode();
     
-    // Bind toggle click listener
+    // Trigger guest sync if pending
+    if (localStorage.getItem('sync_pending') === 'true' && localStorage.getItem('isLoggedIn') === 'true') {
+        await syncGuestData();
+    }
+    
+    // Bind API Endpoint config inputs
+    const apiUrlInput = document.getElementById('api-url-input');
+    const btnApiUrlSave = document.getElementById('btn-api-url-save');
+    if (apiUrlInput) {
+        apiUrlInput.value = API_BASE_URL;
+    }
+    if (btnApiUrlSave) {
+        btnApiUrlSave.addEventListener('click', async () => {
+            const newUrl = apiUrlInput.value.trim().replace(/\/+$/, '');
+            if (!newUrl) return;
+            btnApiUrlSave.innerText = '...';
+            btnApiUrlSave.disabled = true;
+            try {
+                const res = await originalFetch(`${newUrl}/transactions?_limit=1`);
+                if (res.ok) {
+                    API_BASE_URL = newUrl;
+                    API = `${API_BASE_URL}/transactions`;
+                    BILLS_API = `${API_BASE_URL}/bills`;
+                    WANTS_API = `${API_BASE_URL}/wants`;
+                    localStorage.setItem('nothing_budget_api_url', newUrl);
+                    showToast('ENDPOINT SAVED AND CONNECTED!');
+                    await detectDatabaseMode();
+                    await reloadAllData();
+                } else {
+                    throw new Error('Connection failed');
+                }
+            } catch (e) {
+                showToast('CONNECTION FAILED. VERIFY PORT/URL.', 'error');
+            } finally {
+                btnApiUrlSave.innerText = 'Set';
+                btnApiUrlSave.disabled = false;
+            }
+        });
+    }
+
+    // Bind sync button actions
+    const btnSyncAction = document.getElementById('btn-sync-action');
+    if (btnSyncAction) {
+        btnSyncAction.addEventListener('click', () => {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            if (isLoggedIn) {
+                if (window.handleLogout) window.handleLogout();
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+    }
+
+    // Bind database toggle click listener
     const toggleBtn = document.getElementById('btn-db-toggle');
     if (toggleBtn) {
         toggleBtn.addEventListener('click', toggleDatabaseMode);

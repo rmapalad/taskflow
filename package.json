@@ -1,10 +1,10 @@
 {
-  "name": "budget-tracker-api",
+  "name": "mapalad-budget-tracker",
   "version": "1.0.0",
-  "description": "Backend database server for Budget Tracker",
-  "main": "db.json",
+  "description": "MAPALAD - Budget & Transaction Tracker Server",
+  "main": "server.js",
   "scripts": {
-    "start": "json-server --watch db.json --port $PORT"
+    "start": "node server.js"
   },
   "dependencies": {
     "json-server": "^0.17.4"

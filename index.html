@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MAPALAD - Transaction Tracker</title>
+    <!-- No Auth Guard: Guest mode is enabled by default -->
     <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Inter:wght@400;500;600&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
@@ -33,20 +34,20 @@
                 <li data-view="profile"><span class="nav-icon">○</span> Profile<br><span
                         style="font-size: 10px; color: gray;">Active</span></li>
             </ul>
-            <div class="db-status-container"
+            <!-- User Session / Sync Status Container -->
+            <div class="user-status-container"
                 style="margin-top: auto; padding: 24px; border-top: 1px solid var(--border-color); font-size: 11px;">
                 <div
                     style="font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 0.5px;">
-                    Database Mode</div>
+                    Account Status</div>
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                    <span id="db-status-dot"
-                        style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #d1d5db; transition: background-color 0.3s ease;"></span>
-                    <span id="db-status-text"
-                        style="font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Checking...</span>
+                    <span id="user-status-dot"
+                        style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #ef4444; transition: background-color 0.3s ease;"></span>
+                    <span id="user-status-text"
+                        style="font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Guest Mode</span>
                 </div>
-                <button id="btn-db-toggle" class="btn-action"
-                    style="width: 100%; font-size: 10px; padding: 6px; border-radius: var(--radius); text-transform: uppercase; border: 1px solid var(--border-color); background-color: transparent; cursor: pointer; color: var(--text-main); font-weight: 600; margin-top: 4px;">Use
-                    LocalStorage</button>
+                <button id="btn-sync-action" class="btn-action"
+                    style="width: 100%; font-size: 10px; padding: 6px; border-radius: var(--radius); text-transform: uppercase; border: 1px solid var(--border-color); background-color: transparent; cursor: pointer; color: var(--text-main); font-weight: 600; margin-top: 4px;">Sign In / Register</button>
             </div>
         </aside>
 
@@ -570,7 +571,9 @@
                                 style="padding: 10px 16px; font-weight: 600;">Reset Budget Limits</button>
                             <button id="btn-reset-db" class="btn-action del-btn"
                                 style="padding: 10px 16px; font-weight: 600; background-color: var(--accent-red); color: white;">Clear
-                                All Transactions</button>
+                                All Data</button>
+                            <button id="btn-profile-logout" class="btn-action"
+                                style="padding: 10px 16px; font-weight: 600; background-color: var(--text-main); color: white;">Log Out</button>
                         </div>
                     </section>
                 </div>
@@ -578,6 +581,7 @@
             </div>
         </main>
     </div>
+    <div id="toast-container" class="toast-container"></div>
     <script src="js/app.js" defer></script>
 </body>
 

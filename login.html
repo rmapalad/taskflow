@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAPALAD - Access Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/login.css">
+    <script>
+        // Prevent loading login page if already authenticated
+        if (sessionStorage.getItem('isLoggedIn') === 'true') {
+            window.location.href = 'index.html';
+        }
+    </script>
+</head>
+
+<body>
+
+    <div class="login-wrapper">
+        <main class="login-card">
+            <h1 class="login-logo">
+                MAPALAD
+            </h1>
+            <div class="login-subtitle">SECURE ACCESS PORTAL</div>
+
+            <div id="error-banner" class="error-message">
+                INVALID CREDENTIALS. ACCESS DENIED.
+            </div>
+
+            <form id="login-form" class="login-form" novalidate>
+                <div class="input-container">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" autocomplete="username" required placeholder="Enter username...">
+                </div>
+
+                <div class="input-container">
+                    <label for="password">Security Password</label>
+                    <input type="password" id="password" autocomplete="current-password" required placeholder="Enter password...">
+                    <button type="button" id="password-toggle" class="password-toggle" aria-label="Toggle password visibility" title="Toggle password visibility">
+                        👁
+                    </button>
+                </div>
+
+                <button type="submit" id="btn-login" class="btn-login">
+                    <span>ACCESS PORTAL</span>
+                </button>
+            </form>
+
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 20px; text-align: center; font-size: 11px;">
+                <a href="#" id="toggle-register" style="color: var(--text-main); font-weight: 600; text-decoration: none; text-transform: uppercase; letter-spacing: 0.5px;">Don't have an account? Register</a>
+                <a href="#" id="btn-continue-guest" style="color: var(--text-muted); font-weight: 500; text-decoration: none; text-transform: uppercase; letter-spacing: 0.5px; border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 4px;">Continue as Guest</a>
+            </div>
+
+            <div class="tip-box">
+                <strong>SYSTEM NOTE:</strong> You can use the app fully as a Guest. Create an account and sign in to sync your local data to the database automatically.
+            </div>
+        </main>
+    </div>
+
+    <script src="js/login.js" defer></script>
+</body>
+
+</html>
