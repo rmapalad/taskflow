@@ -66,7 +66,7 @@ body {
 /* Cards Row */
 .cards-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 32px; }
 .card { border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px; background-color: #ffffff; display: flex; flex-direction: column; justify-content: space-between; min-height: 140px; }
-.card h3 { font-size: 12px; font-weight: 500; text-transform: uppercase; color: var(--text-main); margin-bottom: 12px; }
+.card h2 { font-size: 12px; font-weight: 500; text-transform: uppercase; color: var(--text-main); margin-bottom: 12px; }
 .card .amount { font-family: 'DotGothic16', sans-serif; font-size: 28px; }
 
 /* Card specific elements */
@@ -85,7 +85,7 @@ body {
 /* Form Layout */
 .form-card, .transactions-card { border: 1px solid var(--border-color); border-radius: var(--radius); padding: 24px; background-color: #ffffff; margin-bottom: 24px; }
 .grid-two-cols .form-card { display: flex; flex-direction: column; justify-content: center; }
-.form-card h3 { font-size: 12px; font-weight: 500; margin-bottom: 16px; }
+.form-card h2, .transactions-card h2 { font-size: 12px; font-weight: 500; margin-bottom: 16px; }
 #transaction-form, #filter-form, #budget-limit-form, #bill-form { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; }
 .form-group { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 120px; }
 .form-group label { font-size: 11px; font-weight: 600; text-transform: uppercase; }
@@ -95,7 +95,7 @@ body {
 
 /* Sorting Controls */
 .table-header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-.table-header-actions h3 { margin-bottom: 0; font-size: 12px; font-weight: 500; }
+.table-header-actions h2 { margin-bottom: 0; font-size: 12px; font-weight: 500; }
 .sort-controls { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); }
 .sort-controls select { padding: 6px 10px; border: 1px solid var(--border-color); border-radius: var(--radius); font-family: inherit; font-size: 11px; background-color: var(--bg-app); color: var(--text-main); cursor: pointer; font-weight: 500; }
 .sort-controls select:focus { outline: none; border-color: var(--text-main); }

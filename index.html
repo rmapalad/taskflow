@@ -82,7 +82,7 @@
                     <div class="cards-row">
                         <div class="card">
                             <div>
-                                <h3>Total Balance</h3>
+                                <h2>Total Balance</h2>
                                 <div class="amount" id="display-balance">₱0.00</div>
                             </div>
                             <div class="sparkline-container">
@@ -92,7 +92,7 @@
 
                         <div class="card">
                             <div>
-                                <h3>Expenses This Month</h3>
+                                <h2>Expenses This Month</h2>
                                 <div class="amount" id="display-expenses">₱0.00</div>
                             </div>
                             <div class="progress-wrapper">
@@ -104,7 +104,7 @@
                         </div>
 
                         <div class="card">
-                            <h3>Budget Utilization</h3>
+                            <h2>Budget Utilization</h2>
                             <ul class="utilization-list" id="budget-utilization-list">
                                 <!-- Populated dynamically -->
                             </ul>
@@ -117,7 +117,7 @@
                         <!-- Advanced Filter & Sort -->
                         <section aria-label="Filter and Sort transactions" id="filter-sort-section" class="form-card"
                             style="margin-bottom: 0;">
-                            <h3>FILTER & SORT</h3>
+                            <h2>FILTER & SORT</h2>
                             <form id="filter-form">
                                 <div class="form-group">
                                     <label for="filter-search">Search Description</label>
@@ -163,7 +163,7 @@
 
                         <!-- Simplified New Transaction -->
                         <section aria-label="Add transaction" class="form-card" style="margin-bottom: 0;">
-                            <h3>QUICK ADD</h3>
+                            <h2>QUICK ADD</h2>
                             <form id="transaction-form">
                                 <div class="form-group">
                                     <label for="date">Date</label>
@@ -177,7 +177,7 @@
                                 <div class="form-group">
                                     <label for="category">Category</label>
                                     <select id="category" name="category" required>
-                                        <!-- Populated dynamically -->
+                                        <option value="">Select a category</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -196,7 +196,7 @@
 
                     <section aria-label="Transaction list" class="transactions-card">
                         <div class="table-header-actions">
-                            <h3>RECENT TRANSACTIONS</h3>
+                            <h2>RECENT TRANSACTIONS</h2>
                         </div>
                         <div class="table-responsive">
                             <table>
@@ -220,7 +220,7 @@
                 <div id="view-bills" style="display: none;">
                     <!-- Add/Edit Bill Card -->
                     <section class="form-card" style="margin-bottom: 24px;">
-                        <h3 id="bill-form-title">NEW BILL</h3>
+                        <h2 id="bill-form-title">NEW BILL</h2>
                         <form id="bill-form">
                             <div class="form-group" style="min-width: 200px; flex: 2;">
                                 <label for="bill-title">Bill Title</label>
@@ -234,7 +234,7 @@
                             </div>
                             <div class="form-group" style="min-width: 110px; flex: 1;">
                                 <label for="bill-priority">Priority</label>
-                                <select id="bill-priority" name="priority" required>
+                                <select id="bill-priority" name="priority">
                                     <option value="low">Low (Wants)</option>
                                     <option value="medium">Medium (Variable)</option>
                                     <option value="high">High (Essential)</option>
@@ -242,7 +242,7 @@
                             </div>
                             <div class="form-group" style="min-width: 110px; flex: 1;">
                                 <label for="bill-status">Status</label>
-                                <select id="bill-status" name="status" required>
+                                <select id="bill-status" name="status">
                                     <option value="pending">Pending</option>
                                     <option value="in-progress">In-Progress</option>
                                     <option value="done">Settled</option>
@@ -259,7 +259,7 @@
                             </div>
                             <div class="form-group" style="min-width: 120px; flex: 1;">
                                 <label for="bill-recurring">Recurring</label>
-                                <select id="bill-recurring" name="recurring" required>
+                                <select id="bill-recurring" name="recurring">
                                     <option value="none">One-time</option>
                                     <option value="monthly">Monthly</option>
                                     <option value="yearly">Yearly</option>
@@ -277,7 +277,7 @@
 
                     <!-- Bills Summary Card -->
                     <section class="transactions-card" style="margin-bottom: 24px;">
-                        <h3>BILLS SUMMARY</h3>
+                        <h2>BILLS SUMMARY</h2>
                         <div class="bills-summary-grid" style="margin-bottom: 16px;">
                             <div class="stat-item">
                                 <div class="stat-label">Total Outstanding</div>
@@ -310,7 +310,7 @@
 
                     <!-- Bills Ledger Table -->
                     <section class="transactions-card">
-                        <h3>BILLS LEDGER</h3>
+                        <h2>BILLS LEDGER</h2>
                         <div class="table-responsive">
                             <table>
                                 <thead>
@@ -337,7 +337,7 @@
                     <div class="grid-two-cols" style="margin-bottom: 24px;">
                         <!-- Budget Allocation & Control Card -->
                         <section class="transactions-card" style="margin-bottom: 0;">
-                            <h3>WANTS BUDGET ALLOCATION</h3>
+                            <h2>WANTS BUDGET ALLOCATION</h2>
                             <div class="stats-grid" style="margin-bottom: 16px;">
                                 <div class="stat-item">
                                     <div class="stat-label">Total Balance</div>
@@ -380,7 +380,7 @@
 
                         <!-- Add/Edit Want Card -->
                         <section class="form-card" style="margin-bottom: 0;">
-                            <h3 id="want-form-title">NEW WANT</h3>
+                            <h2 id="want-form-title">NEW WANT</h2>
                             <form id="want-form">
                                 <div class="form-group">
                                     <label for="want-title">Want Item Title</label>
@@ -395,8 +395,8 @@
                                             required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="want-priority">Priority</label>
-                                        <select id="want-priority" name="priority" required>
+                                         <label for="want-priority">Priority</label>
+                                         <select id="want-priority" name="priority">
                                             <option value="low">Low (Nice to Have)</option>
                                             <option value="medium">Medium (Desirable)</option>
                                             <option value="high">High (Top Want)</option>
@@ -406,8 +406,8 @@
                                 <div
                                     style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; width: 100%; align-items: flex-end;">
                                     <div class="form-group">
-                                        <label for="want-status">Status</label>
-                                        <select id="want-status" name="status" required>
+                                         <label for="want-status">Status</label>
+                                         <select id="want-status" name="status">
                                             <option value="wanted">Wanted</option>
                                             <option value="bought">Bought</option>
                                         </select>
@@ -425,7 +425,7 @@
 
                     <!-- Wants Ledger Table -->
                     <section class="transactions-card">
-                        <h3>WANTS LEDGER</h3>
+                        <h2>WANTS LEDGER</h2>
                         <div class="table-responsive">
                             <table>
                                 <thead>
@@ -448,14 +448,14 @@
                 <!-- Budgets View -->
                 <div id="view-budgets" style="display: none;">
                     <section class="form-card" style="margin-bottom: 24px;">
-                        <h3>SET BUDGET LIMITS</h3>
+                        <h2>SET BUDGET LIMITS</h2>
                         <form id="budget-limit-form">
-                            <div class="form-group">
-                                <label for="budget-category">Category</label>
-                                <select id="budget-category" name="category" required>
-                                    <!-- Populated dynamically -->
-                                </select>
-                            </div>
+                             <div class="form-group">
+                                 <label for="budget-category">Category</label>
+                                 <select id="budget-category" name="category" required>
+                                     <option value="">Select a category</option>
+                                 </select>
+                             </div>
                             <div class="form-group">
                                 <label for="budget-amount">Limit Amount (₱)</label>
                                 <input type="number" id="budget-amount" name="amount" min="0" step="1"
@@ -466,7 +466,7 @@
                     </section>
 
                     <section class="transactions-card">
-                        <h3>BUDGET LIMITS OVERVIEW</h3>
+                        <h2>BUDGET LIMITS OVERVIEW</h2>
                         <div class="table-responsive">
                             <table>
                                 <thead>
@@ -490,13 +490,13 @@
                 <div id="view-analytics" style="display: none;">
                     <div class="analytics-row">
                         <div class="card chart-card">
-                            <h3>Income vs Expenses</h3>
+                            <h2>Income vs Expenses</h2>
                             <div class="chart-container">
                                 <canvas id="analyticsIncomeExpenseChart" width="350" height="200"></canvas>
                             </div>
                         </div>
                         <div class="card chart-card">
-                            <h3>Expenses by Category</h3>
+                            <h2>Expenses by Category</h2>
                             <div class="chart-container">
                                 <canvas id="analyticsCategoryChart" width="350" height="200"></canvas>
                             </div>
@@ -504,7 +504,7 @@
                     </div>
 
                     <section class="transactions-card" style="margin-top: 24px;">
-                        <h3>CATEGORY SPENDING SUMMARY</h3>
+                        <h2>CATEGORY SPENDING SUMMARY</h2>
                         <div class="table-responsive">
                             <table>
                                 <thead>
@@ -528,7 +528,7 @@
                 <div id="view-profile" style="display: none;">
                     <div class="grid-two-cols">
                         <section class="form-card">
-                            <h3>USER PROFILE</h3>
+                            <h2>USER PROFILE</h2>
                             <div class="profile-info">
                                 <div class="profile-avatar-large">N</div>
                                 <div class="profile-details">
@@ -540,7 +540,7 @@
                         </section>
 
                         <section class="transactions-card">
-                            <h3>ACCOUNT STATISTICS</h3>
+                            <h2>ACCOUNT STATISTICS</h2>
                             <div class="stats-grid">
                                 <div class="stat-item">
                                     <div class="stat-label">Total Transactions</div>
@@ -563,7 +563,7 @@
                     </div>
 
                     <section class="form-card" style="margin-top: 24px;">
-                        <h3>DATA CONTROLS</h3>
+                        <h2>DATA CONTROLS</h2>
                         <div class="data-controls" style="display: flex; gap: 12px; flex-wrap: wrap;">
                             <button id="btn-export-csv" class="btn-action"
                                 style="padding: 10px 16px; font-weight: 600;">Export to CSV</button>
@@ -578,7 +578,7 @@
                     </section>
 
                     <section class="form-card" style="margin-top: 24px;">
-                        <h3>API SERVER CONFIGURATION</h3>
+                        <h2>API SERVER CONFIGURATION</h2>
                         
                         <!-- Inline DB Connection Status & Toggle Indicator -->
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
