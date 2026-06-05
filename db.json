@@ -1,95 +1,28 @@
 {
-  "users": [
+  "tasks": [
     {
-      "id": "admin",
-      "password": "admin"
+      "id": "1",
+      "title": "Mechanical Keyboard Kit",
+      "description": "Cost: $120. Custom 75% build layout profile.",
+      "priority": "low",
+      "status": "pending",
+      "dueDate": "2026-06-15"
     },
     {
-      "id": "tester",
-      "password": "password"
-    }
-  ],
-  "transactions": [
-    {
-      "id": "1780552032558",
-      "date": "2026-06-04",
-      "description": "Spotify",
-      "category": "Subscriptions",
-      "type": "expense",
-      "amount": 300,
-      "userId": "roy1"
-    },
-    {
-      "id": "1780552389339",
-      "date": "2026-06-04",
-      "description": "spotify",
-      "category": "Subscriptions",
-      "type": "expense",
-      "amount": 300,
-      "userId": "rmapalad"
-    },
-    {
-      "id": "1780552409982",
-      "date": "2026-06-04",
-      "description": "Salary",
-      "category": "Salary & Income",
-      "type": "income",
-      "amount": 10000,
-      "userId": "rmapalad"
-    },
-    {
-      "id": "1780552476038",
-      "date": "2026-06-04",
-      "description": "Rent",
-      "category": "Subscriptions",
-      "type": "expense",
-      "amount": 5500,
-      "userId": "rmapalad"
-    },
-    {
-      "id": "1780552638805",
-      "date": "2026-06-04",
-      "description": "Income",
-      "category": "Salary & Income",
-      "type": "income",
-      "amount": 10000,
-      "userId": "rmapalad@gmail.com"
-    },
-    {
-      "id": "1780629658547",
-      "date": "260605-06-05",
-      "description": "Local Server Test",
-      "category": "Food & Dining",
-      "type": "expense",
-      "amount": 450,
-      "userId": "tester"
-    }
-  ],
-  "bills": [
-    {
-      "id": "bill-1780552463002",
-      "title": "Rent",
-      "description": "Condo",
+      "id": "2",
+      "title": "Monthly Cloud Server Hosting Fee",
+      "description": "Cost: $15. Essential operational infrastructure billing.",
       "priority": "high",
       "status": "done",
-      "dueDate": "2026-06-04",
-      "amount": 5500,
-      "recurring": "monthly",
-      "userId": "rmapalad",
-      "recurrenceProcessed": true
+      "dueDate": "2026-06-01"
     },
     {
-      "id": "bill-1780552477281",
-      "title": "Rent",
-      "description": "Condo",
-      "priority": "high",
-      "status": "pending",
-      "dueDate": "2026-07-04",
-      "amount": 5500,
-      "recurring": "monthly",
-      "userId": "rmapalad"
+      "id": "3",
+      "title": "Weekly Grocery Restock",
+      "description": "Cost: $65. Standard meal preparation ingredients.",
+      "priority": "medium",
+      "status": "in-progress",
+      "dueDate": "2026-06-08"
     }
-  ],
-  "wants": [],
-  "$schema": "./node_modules/json-server/schema.json"
+  ]
 }

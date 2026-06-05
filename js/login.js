@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
             usernameInput.style.borderColor = '';
             passwordInput.style.borderColor = '';
 
-            const username = usernameInput.value.trim();
+            let username = usernameInput.value.trim();
             const password = passwordInput.value.trim();
 
             // Validation: Both fields required
@@ -123,21 +123,67 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (dbMode === 'json-server') {
                         // SERVER MODE
                         if (mode === 'login') {
-                            const res = await fetch(`${apiUrl}/users/${encodeURIComponent(username)}`);
+                            // Fetch all users to verify case-insensitively
+                            const res = await fetch(`${apiUrl}/users`);
+                            let users = [];
                             if (res.ok) {
-                                const user = await res.json();
+                                users = await res.json();
+                            } else {
+                                // Fallback: try direct query if listing users is not allowed
+                                const singleRes = await fetch(`${apiUrl}/users/${encodeURIComponent(username)}`);
+                                if (singleRes.ok) {
+                                    users = [await singleRes.json()];
+                                }
+                            }
+
+                            const user = users.find(u => u.id.toLowerCase() === username.toLowerCase());
+                            if (user) {
                                 if (user.password === password) {
                                     authSuccess = true;
+                                    username = user.id; // use correct casing from DB
                                 } else {
                                     errorMsg = 'INVALID PASSWORD. ACCESS DENIED.';
                                 }
                             } else {
-                                errorMsg = 'ACCOUNT NOT FOUND.';
+                                // Fallback: check localstorage in case they registered while offline
+                                const localUsers = JSON.parse(localStorage.getItem('nothing_budget_users')) || [];
+                                const localUser = localUsers.find(u => u.id.toLowerCase() === username.toLowerCase());
+                                if (localUser) {
+                                    if (localUser.password === password) {
+                                        // Auto-sync account to the server
+                                        const syncRes = await fetch(`${apiUrl}/users`, {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ id: localUser.id, password: password })
+                                        });
+                                        if (syncRes.ok) {
+                                            authSuccess = true;
+                                            username = localUser.id; // use correct casing from localStorage
+                                        } else {
+                                            errorMsg = 'FAILED TO SYNC OFFLINE ACCOUNT TO SERVER.';
+                                        }
+                                    } else {
+                                        errorMsg = 'INVALID PASSWORD. ACCESS DENIED.';
+                                    }
+                                } else {
+                                    errorMsg = 'ACCOUNT NOT FOUND.';
+                                }
                             }
                         } else {
                             // Register mode
-                            const checkRes = await fetch(`${apiUrl}/users/${encodeURIComponent(username)}`);
-                            if (checkRes.ok) {
+                            const res = await fetch(`${apiUrl}/users`);
+                            let users = [];
+                            if (res.ok) {
+                                users = await res.json();
+                            } else {
+                                const singleRes = await fetch(`${apiUrl}/users/${encodeURIComponent(username)}`);
+                                if (singleRes.ok) {
+                                    users = [await singleRes.json()];
+                                }
+                            }
+
+                            const exists = users.some(u => u.id.toLowerCase() === username.toLowerCase());
+                            if (exists) {
                                 errorMsg = 'USERNAME ALREADY TAKEN.';
                             } else {
                                 const regRes = await fetch(`${apiUrl}/users`, {
@@ -160,6 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (mode === 'login') {
                             if (userIndex !== -1 && users[userIndex].password === password) {
                                 authSuccess = true;
+                                username = users[userIndex].id; // use correct casing from localStorage
                             } else if (userIndex === -1) {
                                 errorMsg = 'ACCOUNT NOT FOUND.';
                             } else {
