@@ -213,3 +213,31 @@
     20%, 60% { transform: translateX(-4px); }
     40%, 80% { transform: translateX(4px); }
 }
+
+/* Database Connection Status Banner */
+.db-status-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 12px;
+}
+
+.db-status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #d97706; /* Orange/Amber default */
+    transition: background-color 0.3s ease;
+}
+
+.db-status-text {
+    color: var(--text-muted);
+}

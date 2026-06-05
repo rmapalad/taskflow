@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="css/login.css">
     <script>
         // Prevent loading login page if already authenticated
-        if (localStorage.getItem('isLoggedIn') === 'true') {
+        if (sessionStorage.getItem('isLoggedIn') === 'true') {
             window.location.href = 'index.html';
         }
     </script>
@@ -25,6 +25,11 @@
                 MAPALAD
             </h1>
             <div class="login-subtitle">SECURE ACCESS PORTAL</div>
+
+            <div id="db-status-container" class="db-status-container">
+                <span id="db-status-dot" class="db-status-dot"></span>
+                <span id="db-status-text" class="db-status-text">Detecting Database...</span>
+            </div>
 
             <div id="error-banner" class="error-message">
                 INVALID CREDENTIALS. ACCESS DENIED.

@@ -9,30 +9,66 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleRegisterLink = document.getElementById('toggle-register');
     const continueGuestLink = document.getElementById('btn-continue-guest');
     const loginSubtitle = document.querySelector('.login-subtitle');
+    const dbStatusDot = document.getElementById('db-status-dot');
+    const dbStatusText = document.getElementById('db-status-text');
 
     let mode = 'login'; // 'login' or 'register'
 
     // Get configured API url (default to local json-server)
     const getApiUrl = () => {
-        const savedUrl = localStorage.getItem('nothing_budget_api_url');
-        if (savedUrl) return savedUrl;
-        return (window.location.origin && window.location.origin.startsWith('http')) 
-            ? window.location.origin 
-            : 'http://localhost:8080';
+        const defaultUrl = (window.location.protocol === 'http:' || window.location.protocol === 'https:')
+            ? window.location.origin
+            : 'https://taskflow-1-mnlb.onrender.com';
+        return localStorage.getItem('nothing_budget_api_url') || defaultUrl;
     };
 
-    // Detect DB mode
-    async function detectDbMode(apiUrl) {
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 1000);
-            const res = await fetch(`${apiUrl}/transactions?_limit=1`, { signal: controller.signal });
-            clearTimeout(timeoutId);
-            return res.ok ? 'json-server' : 'localstorage';
-        } catch (e) {
-            return 'localstorage';
+    function updateDbStatusUI(state, text) {
+        if (!dbStatusDot || !dbStatusText) return;
+        if (state === 'connecting') {
+            dbStatusDot.style.backgroundColor = '#d97706'; // Orange/Amber
+            dbStatusText.innerText = text || 'Connecting to Server...';
+            dbStatusText.style.color = '#d97706';
+        } else if (state === 'connected') {
+            dbStatusDot.style.backgroundColor = '#10b981'; // Green
+            dbStatusText.innerText = text || 'Server Mode Active';
+            dbStatusText.style.color = '#10b981';
+        } else {
+            dbStatusDot.style.backgroundColor = '#6366f1'; // Indigo/Blue
+            dbStatusText.innerText = text || 'LocalStorage Mode (Offline)';
+            dbStatusText.style.color = '#6366f1';
         }
     }
+
+    // Detect DB mode with retries for cold start support
+    async function detectDbMode(apiUrl) {
+        const isServerEnv = (window.location.protocol === 'http:' || window.location.protocol === 'https:');
+        const maxRetries = isServerEnv ? 15 : 3; // Retry more on server to support cold start
+        const retryDelay = 2000;
+        
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            updateDbStatusUI('connecting', attempt > 1 ? `Waking up Server (Attempt ${attempt}/${maxRetries})...` : 'Connecting to Server...');
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 2000); // 2s timeout
+                const res = await fetch(`${apiUrl}/transactions?_limit=1`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+                if (res.ok) {
+                    updateDbStatusUI('connected');
+                    return 'json-server';
+                }
+            } catch (e) {
+                console.warn(`Connection attempt ${attempt} failed:`, e);
+            }
+            if (attempt < maxRetries) {
+                await new Promise(resolve => setTimeout(resolve, retryDelay));
+            }
+        }
+        updateDbStatusUI('offline');
+        return 'localstorage';
+    }
+
+    const apiUrl = getApiUrl();
+    const dbModePromise = detectDbMode(apiUrl);
 
     // Toggle Mode
     if (toggleRegisterLink) {
@@ -86,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
             usernameInput.style.borderColor = '';
             passwordInput.style.borderColor = '';
 
-            let username = usernameInput.value.trim();
+            const username = usernameInput.value.trim();
             const password = passwordInput.value.trim();
 
             // Validation: Both fields required
@@ -111,8 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
             caret.className = 'caret-blink';
             submitBtn.appendChild(caret);
 
-            const apiUrl = getApiUrl();
-            const dbMode = await detectDbMode(apiUrl);
+            const dbMode = await dbModePromise;
 
             // simulated network auth handshake delay (800ms)
             setTimeout(async () => {
@@ -123,67 +158,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (dbMode === 'json-server') {
                         // SERVER MODE
                         if (mode === 'login') {
-                            // Fetch all users to verify case-insensitively
-                            const res = await fetch(`${apiUrl}/users`);
-                            let users = [];
+                            const res = await fetch(`${apiUrl}/users/${encodeURIComponent(username)}`);
                             if (res.ok) {
-                                users = await res.json();
-                            } else {
-                                // Fallback: try direct query if listing users is not allowed
-                                const singleRes = await fetch(`${apiUrl}/users/${encodeURIComponent(username)}`);
-                                if (singleRes.ok) {
-                                    users = [await singleRes.json()];
-                                }
-                            }
-
-                            const user = users.find(u => u.id.toLowerCase() === username.toLowerCase());
-                            if (user) {
+                                const user = await res.json();
                                 if (user.password === password) {
                                     authSuccess = true;
-                                    username = user.id; // use correct casing from DB
                                 } else {
                                     errorMsg = 'INVALID PASSWORD. ACCESS DENIED.';
                                 }
                             } else {
-                                // Fallback: check localstorage in case they registered while offline
-                                const localUsers = JSON.parse(localStorage.getItem('nothing_budget_users')) || [];
-                                const localUser = localUsers.find(u => u.id.toLowerCase() === username.toLowerCase());
-                                if (localUser) {
-                                    if (localUser.password === password) {
-                                        // Auto-sync account to the server
-                                        const syncRes = await fetch(`${apiUrl}/users`, {
-                                            method: 'POST',
-                                            headers: { 'Content-Type': 'application/json' },
-                                            body: JSON.stringify({ id: localUser.id, password: password })
-                                        });
-                                        if (syncRes.ok) {
-                                            authSuccess = true;
-                                            username = localUser.id; // use correct casing from localStorage
-                                        } else {
-                                            errorMsg = 'FAILED TO SYNC OFFLINE ACCOUNT TO SERVER.';
-                                        }
-                                    } else {
-                                        errorMsg = 'INVALID PASSWORD. ACCESS DENIED.';
-                                    }
-                                } else {
-                                    errorMsg = 'ACCOUNT NOT FOUND.';
-                                }
+                                errorMsg = 'ACCOUNT NOT FOUND.';
                             }
                         } else {
                             // Register mode
-                            const res = await fetch(`${apiUrl}/users`);
-                            let users = [];
-                            if (res.ok) {
-                                users = await res.json();
-                            } else {
-                                const singleRes = await fetch(`${apiUrl}/users/${encodeURIComponent(username)}`);
-                                if (singleRes.ok) {
-                                    users = [await singleRes.json()];
-                                }
-                            }
-
-                            const exists = users.some(u => u.id.toLowerCase() === username.toLowerCase());
-                            if (exists) {
+                            const checkRes = await fetch(`${apiUrl}/users/${encodeURIComponent(username)}`);
+                            if (checkRes.ok) {
                                 errorMsg = 'USERNAME ALREADY TAKEN.';
                             } else {
                                 const regRes = await fetch(`${apiUrl}/users`, {
@@ -193,6 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 });
                                 if (regRes.ok) {
                                     authSuccess = true;
+                                    localStorage.setItem('sync_user_pending', 'true');
                                 } else {
                                     errorMsg = 'REGISTRATION FAILED.';
                                 }
@@ -206,7 +196,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (mode === 'login') {
                             if (userIndex !== -1 && users[userIndex].password === password) {
                                 authSuccess = true;
-                                username = users[userIndex].id; // use correct casing from localStorage
                             } else if (userIndex === -1) {
                                 errorMsg = 'ACCOUNT NOT FOUND.';
                             } else {
@@ -227,7 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (authSuccess) {
                         localStorage.setItem('isLoggedIn', 'true');
                         localStorage.setItem('username', username);
-                        localStorage.setItem('nothing_budget_db_mode', dbMode);
 
                         // Check if guest has data to sync
                         const transGuest = JSON.parse(localStorage.getItem('nothing_budget_transactions_guest')) || [];

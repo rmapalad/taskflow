@@ -1,5 +1,5 @@
 // Database Mode and Seed Data
-let dbMode = localStorage.getItem('nothing_budget_db_mode') || 'json-server'; // 'json-server' or 'localstorage'
+let dbMode = 'json-server'; // 'json-server' or 'localstorage'
 
 const SEED_DATA = {
     transactions: [],
@@ -46,7 +46,6 @@ async function toggleDatabaseMode() {
     
     if (dbMode === 'json-server') {
         dbMode = 'localstorage';
-        localStorage.setItem('nothing_budget_db_mode', dbMode);
         initLocalStorageData();
         updateDatabaseStatusUI();
         await reloadAllData();
@@ -58,7 +57,6 @@ async function toggleDatabaseMode() {
             const res = await originalFetch(`${API_BASE_URL}/transactions?_limit=1`);
             if (res.ok) {
                 dbMode = 'json-server';
-                localStorage.setItem('nothing_budget_db_mode', dbMode);
                 updateDatabaseStatusUI();
                 await reloadAllData();
             } else {
@@ -67,7 +65,6 @@ async function toggleDatabaseMode() {
         } catch (err) {
             alert(`Could not connect to Server. Make sure it is running at ${API_BASE_URL}!`);
             dbMode = 'localstorage';
-            localStorage.setItem('nothing_budget_db_mode', dbMode);
             updateDatabaseStatusUI();
         } finally {
             toggleBtn.disabled = false;
@@ -84,22 +81,44 @@ async function reloadAllData() {
 }
 
 async function detectDatabaseMode() {
-    try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 1500); // 1.5s timeout
-        
-        const res = await originalFetch(`${API_BASE_URL}/transactions?_limit=1`, { signal: controller.signal });
-        clearTimeout(timeoutId);
-        
-        if (res.ok) {
-            dbMode = 'json-server';
-        } else {
-            dbMode = 'localstorage';
-        }
-    } catch (err) {
-        dbMode = 'localstorage';
+    const isServerEnv = (window.location.protocol === 'http:' || window.location.protocol === 'https:');
+    const maxRetries = isServerEnv ? 15 : 3; // Support cold start waking up
+    const retryDelay = 2000;
+    
+    // Set a connecting state text
+    const textEl = document.getElementById('db-status-text');
+    if (textEl) {
+        textEl.innerText = 'Connecting...';
+        textEl.style.color = '#d97706';
     }
-    localStorage.setItem('nothing_budget_db_mode', dbMode);
+    const dotEl = document.getElementById('db-status-dot');
+    if (dotEl) {
+        dotEl.style.backgroundColor = '#d97706';
+    }
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2000); // 2s timeout
+            
+            const res = await originalFetch(`${API_BASE_URL}/transactions?_limit=1`, { signal: controller.signal });
+            clearTimeout(timeoutId);
+            
+            if (res.ok) {
+                dbMode = 'json-server';
+                initLocalStorageData();
+                updateDatabaseStatusUI();
+                return;
+            }
+        } catch (err) {
+            console.warn(`app.js connection attempt ${attempt} failed:`, err);
+        }
+        if (attempt < maxRetries) {
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
+        }
+    }
+    
+    dbMode = 'localstorage';
     initLocalStorageData();
     updateDatabaseStatusUI();
 }
@@ -247,7 +266,6 @@ async function customFetch(url, options = {}) {
         } catch (err) {
             console.warn("Server connection failed. Switching to user LocalStorage mode.", err);
             dbMode = 'localstorage';
-            localStorage.setItem('nothing_budget_db_mode', dbMode);
             updateDatabaseStatusUI();
             // fall through to localstorage handler below
         }
@@ -309,8 +327,13 @@ async function customFetch(url, options = {}) {
 }
 window.fetch = customFetch;
 
-let API_BASE_URL = localStorage.getItem('nothing_budget_api_url') || 
-    ((window.location.origin && window.location.origin.startsWith('http')) ? window.location.origin : 'http://localhost:8080');
+const getDefaultApiUrl = () => {
+    const defaultUrl = (window.location.protocol === 'http:' || window.location.protocol === 'https:')
+        ? window.location.origin
+        : 'https://taskflow-1-mnlb.onrender.com';
+    return localStorage.getItem('nothing_budget_api_url') || defaultUrl;
+};
+let API_BASE_URL = getDefaultApiUrl();
 let API = `${API_BASE_URL}/transactions`;
 let BILLS_API = `${API_BASE_URL}/bills`;
 let WANTS_API = `${API_BASE_URL}/wants`;
@@ -2271,6 +2294,84 @@ async function syncGuestData() {
     }
 }
 
+// User local data sync helper (restores data if the server was reset)
+async function syncUserData(username) {
+    if (!username) return;
+
+    const transactionsKey = `nothing_budget_transactions_user_${username}`;
+    const billsKey = `nothing_budget_bills_user_${username}`;
+    const wantsKey = `nothing_budget_wants_user_${username}`;
+
+    const transactionsLocal = JSON.parse(localStorage.getItem(transactionsKey)) || [];
+    const billsLocal = JSON.parse(localStorage.getItem(billsKey)) || [];
+    const wantsLocal = JSON.parse(localStorage.getItem(wantsKey)) || [];
+
+    let syncCount = 0;
+
+    try {
+        // 1. Sync Transactions
+        const userTRes = await fetch(API);
+        const existingUserT = userTRes.ok ? await userTRes.json() : [];
+        const existingTIds = new Set(existingUserT.map(t => String(t.id)));
+
+        for (const t of transactionsLocal) {
+            if (existingTIds.has(String(t.id))) continue;
+            const syncedT = { ...t };
+            await fetch(API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(syncedT)
+            });
+            syncCount++;
+        }
+
+        // 2. Sync Bills
+        const userBRes = await fetch(BILLS_API);
+        const existingUserB = userBRes.ok ? await userBRes.json() : [];
+        const existingBIds = new Set(existingUserB.map(b => String(b.id)));
+
+        for (const b of billsLocal) {
+            if (existingBIds.has(String(b.id))) continue;
+            const syncedB = { ...b };
+            await fetch(BILLS_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(syncedB)
+            });
+            syncCount++;
+        }
+
+        // 3. Sync Wants
+        const userWRes = await fetch(WANTS_API);
+        const existingUserW = userWRes.ok ? await userWRes.json() : [];
+        const existingWIds = new Set(existingUserW.map(w => String(w.id)));
+
+        for (const w of wantsLocal) {
+            if (existingWIds.has(String(w.id))) continue;
+            const syncedW = { ...w };
+            await fetch(WANTS_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(syncedW)
+            });
+            syncCount++;
+        }
+
+        if (syncCount > 0) {
+            showToast(`RESTORED ${syncCount} LOCAL ITEMS TO YOUR ACCOUNT!`);
+        }
+    } catch (err) {
+        console.error('User data sync failed:', err);
+        showToast('DATA RESTORATION FAILED.', 'error');
+    } finally {
+        localStorage.removeItem(transactionsKey);
+        localStorage.removeItem(billsKey);
+        localStorage.removeItem(wantsKey);
+        localStorage.removeItem('sync_user_pending');
+        await reloadAllData();
+    }
+}
+
 // Initialize App
 document.addEventListener('DOMContentLoaded', async () => {
     updateUserProfileUI();
@@ -2292,6 +2393,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Trigger guest sync if pending
     if (localStorage.getItem('sync_pending') === 'true' && localStorage.getItem('isLoggedIn') === 'true') {
         await syncGuestData();
+    }
+
+    // Trigger user data sync if pending (e.g. after server resets)
+    if (localStorage.getItem('sync_user_pending') === 'true' && localStorage.getItem('isLoggedIn') === 'true' && dbMode === 'json-server') {
+        const currentUsername = localStorage.getItem('username');
+        if (currentUsername) {
+            await syncUserData(currentUsername);
+        }
     }
     
     // Bind API Endpoint config inputs

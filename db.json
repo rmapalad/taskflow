@@ -24,5 +24,24 @@
       "status": "in-progress",
       "dueDate": "2026-06-08"
     }
-  ]
+  ],
+  "users": [
+    {
+      "id": "tester",
+      "password": "password"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "1780631602307",
+      "date": "2026-06-05",
+      "description": "Test Offline Sync Item",
+      "category": "Food & Dining",
+      "type": "expense",
+      "amount": 99.99,
+      "userId": "tester"
+    }
+  ],
+  "bills": [],
+  "wants": []
 }
