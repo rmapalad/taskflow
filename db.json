@@ -3,6 +3,10 @@
     {
       "id": "admin",
       "password": "admin"
+    },
+    {
+      "id": "tester",
+      "password": "password"
     }
   ],
   "transactions": [
@@ -50,6 +54,15 @@
       "type": "income",
       "amount": 10000,
       "userId": "rmapalad@gmail.com"
+    },
+    {
+      "id": "1780629658547",
+      "date": "260605-06-05",
+      "description": "Local Server Test",
+      "category": "Food & Dining",
+      "type": "expense",
+      "amount": 450,
+      "userId": "tester"
     }
   ],
   "bills": [

@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="css/login.css">
     <script>
         // Prevent loading login page if already authenticated
-        if (sessionStorage.getItem('isLoggedIn') === 'true') {
+        if (localStorage.getItem('isLoggedIn') === 'true') {
             window.location.href = 'index.html';
         }
     </script>

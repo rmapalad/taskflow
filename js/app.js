@@ -1,5 +1,5 @@
 // Database Mode and Seed Data
-let dbMode = 'json-server'; // 'json-server' or 'localstorage'
+let dbMode = localStorage.getItem('nothing_budget_db_mode') || 'json-server'; // 'json-server' or 'localstorage'
 
 const SEED_DATA = {
     transactions: [],
@@ -46,6 +46,7 @@ async function toggleDatabaseMode() {
     
     if (dbMode === 'json-server') {
         dbMode = 'localstorage';
+        localStorage.setItem('nothing_budget_db_mode', dbMode);
         initLocalStorageData();
         updateDatabaseStatusUI();
         await reloadAllData();
@@ -57,6 +58,7 @@ async function toggleDatabaseMode() {
             const res = await originalFetch(`${API_BASE_URL}/transactions?_limit=1`);
             if (res.ok) {
                 dbMode = 'json-server';
+                localStorage.setItem('nothing_budget_db_mode', dbMode);
                 updateDatabaseStatusUI();
                 await reloadAllData();
             } else {
@@ -65,6 +67,7 @@ async function toggleDatabaseMode() {
         } catch (err) {
             alert(`Could not connect to Server. Make sure it is running at ${API_BASE_URL}!`);
             dbMode = 'localstorage';
+            localStorage.setItem('nothing_budget_db_mode', dbMode);
             updateDatabaseStatusUI();
         } finally {
             toggleBtn.disabled = false;
@@ -96,6 +99,7 @@ async function detectDatabaseMode() {
     } catch (err) {
         dbMode = 'localstorage';
     }
+    localStorage.setItem('nothing_budget_db_mode', dbMode);
     initLocalStorageData();
     updateDatabaseStatusUI();
 }
@@ -243,6 +247,7 @@ async function customFetch(url, options = {}) {
         } catch (err) {
             console.warn("Server connection failed. Switching to user LocalStorage mode.", err);
             dbMode = 'localstorage';
+            localStorage.setItem('nothing_budget_db_mode', dbMode);
             updateDatabaseStatusUI();
             // fall through to localstorage handler below
         }
@@ -304,7 +309,8 @@ async function customFetch(url, options = {}) {
 }
 window.fetch = customFetch;
 
-let API_BASE_URL = localStorage.getItem('nothing_budget_api_url') || 'https://taskflow-1-mnlb.onrender.com';
+let API_BASE_URL = localStorage.getItem('nothing_budget_api_url') || 
+    ((window.location.origin && window.location.origin.startsWith('http')) ? window.location.origin : 'http://localhost:8080');
 let API = `${API_BASE_URL}/transactions`;
 let BILLS_API = `${API_BASE_URL}/bills`;
 let WANTS_API = `${API_BASE_URL}/wants`;

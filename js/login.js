@@ -14,7 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Get configured API url (default to local json-server)
     const getApiUrl = () => {
-        return localStorage.getItem('nothing_budget_api_url') || 'https://taskflow-1-mnlb.onrender.com';
+        const savedUrl = localStorage.getItem('nothing_budget_api_url');
+        if (savedUrl) return savedUrl;
+        return (window.location.origin && window.location.origin.startsWith('http')) 
+            ? window.location.origin 
+            : 'http://localhost:8080';
     };
 
     // Detect DB mode
@@ -176,6 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (authSuccess) {
                         localStorage.setItem('isLoggedIn', 'true');
                         localStorage.setItem('username', username);
+                        localStorage.setItem('nothing_budget_db_mode', dbMode);
 
                         // Check if guest has data to sync
                         const transGuest = JSON.parse(localStorage.getItem('nothing_budget_transactions_guest')) || [];
