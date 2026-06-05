@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Get configured API url (default to local json-server)
     const getApiUrl = () => {
-        return localStorage.getItem('nothing_budget_api_url') || 'http://localhost:3000';
+        return localStorage.getItem('nothing_budget_api_url') || 'https://taskflow-1-mnlb.onrender.com';
     };
 
     // Detect DB mode

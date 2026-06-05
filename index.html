@@ -34,9 +34,24 @@
                 <li data-view="profile"><span class="nav-icon">○</span> Profile<br><span
                         style="font-size: 10px; color: gray;">Active</span></li>
             </ul>
+            <!-- Database Engine / Sync Status Container -->
+            <div class="db-status-container"
+                style="margin-top: auto; padding: 24px; border-top: 1px solid var(--border-color); font-size: 11px;">
+                <div
+                    style="font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 0.5px;">
+                    Database Status</div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    <span id="db-status-dot"
+                        style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #ef4444; transition: background-color 0.3s ease;"></span>
+                    <span id="db-status-text"
+                        style="font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Detecting...</span>
+                </div>
+                <button id="btn-db-toggle" class="btn-action"
+                    style="width: 100%; font-size: 10px; padding: 6px; border-radius: var(--radius); text-transform: uppercase; border: 1px solid var(--border-color); background-color: transparent; cursor: pointer; color: var(--text-main); font-weight: 600; margin-top: 4px;">Use LocalStorage</button>
+            </div>
             <!-- User Session / Sync Status Container -->
             <div class="user-status-container"
-                style="margin-top: auto; padding: 24px; border-top: 1px solid var(--border-color); font-size: 11px;">
+                style="padding: 24px; border-top: 1px solid var(--border-color); font-size: 11px;">
                 <div
                     style="font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 0.5px;">
                     Account Status</div>
@@ -574,6 +589,17 @@
                                 All Data</button>
                             <button id="btn-profile-logout" class="btn-action"
                                 style="padding: 10px 16px; font-weight: 600; background-color: var(--text-main); color: white;">Log Out</button>
+                        </div>
+                    </section>
+
+                    <section class="form-card" style="margin-top: 24px;">
+                        <h3>API SERVER CONFIGURATION</h3>
+                        <div style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; width: 100%;">
+                            <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+                                <label for="api-url-input">API Server Base URL</label>
+                                <input type="text" id="api-url-input" placeholder="e.g. https://your-app.onrender.com" style="width: 100%;">
+                            </div>
+                            <button id="btn-api-url-save" class="btn-submit" style="height: 40px; margin-bottom: 0; min-width: 80px; padding: 10px 24px; font-weight: 600;">Set URL</button>
                         </div>
                     </section>
                 </div>

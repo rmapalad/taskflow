@@ -304,7 +304,7 @@ async function customFetch(url, options = {}) {
 }
 window.fetch = customFetch;
 
-let API_BASE_URL = localStorage.getItem('nothing_budget_api_url') || 'http://localhost:8080';
+let API_BASE_URL = localStorage.getItem('nothing_budget_api_url') || 'https://taskflow-1-mnlb.onrender.com';
 let API = `${API_BASE_URL}/transactions`;
 let BILLS_API = `${API_BASE_URL}/bills`;
 let WANTS_API = `${API_BASE_URL}/wants`;

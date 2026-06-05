@@ -14,9 +14,69 @@
       "type": "expense",
       "amount": 300,
       "userId": "roy1"
+    },
+    {
+      "id": "1780552389339",
+      "date": "2026-06-04",
+      "description": "spotify",
+      "category": "Subscriptions",
+      "type": "expense",
+      "amount": 300,
+      "userId": "rmapalad"
+    },
+    {
+      "id": "1780552409982",
+      "date": "2026-06-04",
+      "description": "Salary",
+      "category": "Salary & Income",
+      "type": "income",
+      "amount": 10000,
+      "userId": "rmapalad"
+    },
+    {
+      "id": "1780552476038",
+      "date": "2026-06-04",
+      "description": "Rent",
+      "category": "Subscriptions",
+      "type": "expense",
+      "amount": 5500,
+      "userId": "rmapalad"
+    },
+    {
+      "id": "1780552638805",
+      "date": "2026-06-04",
+      "description": "Income",
+      "category": "Salary & Income",
+      "type": "income",
+      "amount": 10000,
+      "userId": "rmapalad@gmail.com"
     }
   ],
-  "bills": [],
+  "bills": [
+    {
+      "id": "bill-1780552463002",
+      "title": "Rent",
+      "description": "Condo",
+      "priority": "high",
+      "status": "done",
+      "dueDate": "2026-06-04",
+      "amount": 5500,
+      "recurring": "monthly",
+      "userId": "rmapalad",
+      "recurrenceProcessed": true
+    },
+    {
+      "id": "bill-1780552477281",
+      "title": "Rent",
+      "description": "Condo",
+      "priority": "high",
+      "status": "pending",
+      "dueDate": "2026-07-04",
+      "amount": 5500,
+      "recurring": "monthly",
+      "userId": "rmapalad"
+    }
+  ],
   "wants": [],
   "$schema": "./node_modules/json-server/schema.json"
 }

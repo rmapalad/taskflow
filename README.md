@@ -1,5 +1,9 @@
 # 🪙 MAPALAD - Budget & Transaction Tracker
 
+*   **Developer Name:** Christian Roy Mapalad
+*   **Live App URL (Vercel):** [Live Deployment Details](https://vercel.com/rmapalad-5825s-projects/taskflow-97nq/5vZ4pnmBbd1dEdS7Qjp5ZnRAW8nv)
+*   **Live API URL (Render):** [JSON-Server API Service](https://taskflow-1-mnlb.onrender.com/)
+
 MAPALAD is a premium, feature-rich personal finance management dashboard designed to help you organize expenses, track recurring bills, allocate budgets, and plan wants. Built using modern semantic HTML, custom vanilla CSS styling, and raw JavaScript, it offers a visual experience with interactive charts, real-time analytics, and dual-database connectivity.
 
 ---
@@ -76,32 +80,30 @@ Budget Tracker/
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Getting Started & Run Instructions
 
-MAPALAD is ready to run immediately. You can choose to run it offline or set up the API database server.
+MAPALAD is ready to run immediately. You can run the application locally using a static web server or connect it to your live API.
 
-### Option A: LocalServer Mode (Recommended)
-This mode connects the app to the `db.json` database.
+### 1. Running the Frontend Locally (via Local Static Server)
+Do not open `index.html` by double-clicking it. Instead, serve the application using a static web server:
 
-1.  Make sure you have [Node.js](https://nodejs.org/) installed.
-2.  Install `json-server` globally, or run it directly using `npx`:
-    ```bash
-    npx json-server --watch db.json --port 3000
-    ```
-3.  Open `index.html` directly in your browser or run it using a local static server extension (e.g., Live Server in VS Code).
-4.  The sidebar database mode indicator will light up green (**Server Mode**).
+1. Make sure you have [Node.js](https://nodejs.org/) installed.
+2. Open a terminal in the project root directory and run:
+   ```bash
+   npx serve
+   ```
+3. Open the provided URL (e.g. `http://localhost:3000` or `http://localhost:5000`) in your web browser.
 
-### Option B: Offline / LocalStorage Mode (Zero Setup)
-If the local server is not detected, the app automatically switches to **LocalStorage Mode**.
+### 2. Database Mode Connectivity (Live Server vs. LocalStorage)
+The application dynamically switches between a live backend database and local storage demo:
 
-1.  Open `index.html` directly in any web browser.
-2.  The application will automatically initialize browser local storage with seed data.
-3.  The database mode indicator will show purple (**LocalStorage Mode**). All operations will save locally inside your browser cache.
+*   **Live Server Mode:** By default, the application connects to the live API on Render (`https://taskflow-1-mnlb.onrender.com`). You can also toggle/set custom server URLs via the **API Server Configuration** input located in the **Profile** tab.
+*   **LocalStorage Offline Mode:** If the connection to the API is unavailable or manually toggled off via the Database Status control in the sidebar, the app falls back to LocalStorage mode, using seed data stored in your browser.
 
 ---
 
-## 💡 Usage Highlights
+## 💡 Usage Highlights & Defense Tips
 
-*   **Status Indicators:** Look out for color-coded priority tags (`low`, `medium`, `high`) and transaction amounts (green for positive income, red for negative expenses).
-*   **Filter Clears:** Click the **Clear Filters** button in the Filter & Sort box to immediately revert back to your default monthly view.
-*   **Database Syncing:** If you start the local `json-server` later, simply click the **Connect to Server** button in the sidebar to sync your sessions.
+*   **Custom Status Indicators:** Features a dynamic live status indicator dot in the sidebar for Database Mode (Green for Server Mode, Indigo/Blue for LocalStorage Mode).
+*   **Authentication & Sync:** Log in with an account to sync offline Guest transactions, bills, and wants automatically to the live backend server database.
+*   **Filter Clears:** Click the **Clear Filters** button on the Transactions tab to quickly revert to the default month's transaction listing.
