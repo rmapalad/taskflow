@@ -1,0 +1,41 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to verify user authentication status
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function to check if the authenticated user matches the owner ID of the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Secure read/write rules for application data collections: transactions, bills, wants
+    match /{collectionName}/{documentId} {
+      allow read: if isAuthenticated() && (
+        resource == null || isOwner(resource.data.userId)
+      );
+      
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userId);
+      
+      allow update: if isAuthenticated() && isOwner(resource.data.userId) && isOwner(request.resource.data.userId);
+      
+      allow delete: if isAuthenticated() && isOwner(resource.data.userId);
+    }
+
+    // Public read/write/upvote suggestions
+    match /suggestions/{documentId} {
+      allow read, create, update: if true;
+      allow delete: if false;
+    }
+
+    // Public write-only contact messages
+    match /contact_messages/{documentId} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+  }
+}
